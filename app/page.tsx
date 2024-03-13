@@ -253,9 +253,7 @@ function StatsImage(props: StatsImageProps) {
 export default async function Home({ searchParams }: NextServerPageProps) {
   const previousFrame = getPreviousFrame<State>(searchParams);
 
-  const frameMessage = await getFrameMessage(previousFrame.postBody, {
-    hubHttpUrl: DEFAULT_DEBUGGER_HUB_URL,
-  });
+  const frameMessage = await getFrameMessage(previousFrame.postBody);
 
   if (frameMessage && !frameMessage?.isValid) {
     throw new Error("Invalid frame payload");
@@ -333,9 +331,6 @@ export default async function Home({ searchParams }: NextServerPageProps) {
     );
   }
 
-  console.log("info: state is:", state);
-
-  // then, when done, return next frame
   return (
     <div className="p-4">
       <FrameContainer
