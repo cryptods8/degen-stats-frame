@@ -18,6 +18,7 @@ type Page = "INITIAL" | "STATS";
 
 type State = {
   page: Page;
+  ts?: number;
 };
 
 const initialState: State = { page: "INITIAL" };
@@ -33,6 +34,7 @@ const FAKE_DATA = {
 const reducer: FrameReducer<State> = (state, action) => {
   return {
     page: "STATS",
+    ts: Date.now(),
     // page: state.page === "INITIAL" ? "STATS" : "INITIAL",
   };
 };
