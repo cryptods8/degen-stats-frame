@@ -16,7 +16,7 @@ type Page = "INITIAL" | "STATS";
 
 type State = {
   page: Page;
-  ts?: number;
+  // ts?: number;
 };
 
 const initialState: State = { page: "INITIAL" };
@@ -24,7 +24,7 @@ const initialState: State = { page: "INITIAL" };
 const reducer: FrameReducer<State> = (state, action) => {
   return {
     page: "STATS",
-    ts: Date.now(),
+    // ts: Date.now(),
     // page: state.page === "INITIAL" ? "STATS" : "INITIAL",
   };
 };
