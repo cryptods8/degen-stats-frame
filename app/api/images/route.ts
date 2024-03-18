@@ -1,6 +1,10 @@
 import { NextRequest } from "next/server";
 
-import { generateInitialImage, generateErrorImage, generateStatsImage } from "./generate-image";
+import {
+  generateInitialImage,
+  generateErrorImage,
+  generateStatsImage,
+} from "./generate-image";
 import { baseUrl } from "../../constants";
 import { verifySignedUrl } from "../../signer";
 import { getAddressesForFid, getUserDataForFid } from "frames.js";
@@ -17,6 +21,8 @@ function verifyUrl(req: NextRequest) {
   const verifiedUrl = verifySignedUrl(url);
   return new URL(verifiedUrl);
 }
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const start = Date.now();
@@ -41,7 +47,9 @@ export async function GET(req: NextRequest) {
     return generateStatsImage({ stats, addresses, userData });
   } catch (e) {
     console.error(e);
-    return generateErrorImage({ error: "Error occured: " + (e as any).message });
+    return generateErrorImage({
+      error: "Error occured: " + (e as any).message,
+    });
   } finally {
     console.log(`Time for GET /api/images: ${Date.now() - start}ms`);
   }
