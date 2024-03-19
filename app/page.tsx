@@ -11,6 +11,7 @@ import {
 import { DEFAULT_DEBUGGER_HUB_URL } from "./debug";
 import { baseUrl } from "./constants";
 import { signUrl, verifySignedUrl } from "./signer";
+import { currentURL } from "./utils";
 
 type Page = "INITIAL" | "STATS";
 
@@ -29,13 +30,13 @@ const reducer: FrameReducer<State> = (state, action) => {
   };
 };
 
-function createShareUrl(fid: number): string {
+function createShareUrl(baseUrl: string, fid: number): string {
   const params = new URLSearchParams();
   params.set("fid", fid.toString());
   const fullUrl = `${baseUrl}/?${params.toString()}`;
   const signedUrl = signUrl(fullUrl);
 
-  console.log("signedUrl", signedUrl);
+  // console.log("signedUrl", signedUrl);
 
   const shareRedirectParams = new URLSearchParams();
   shareRedirectParams.append("text", "My $DEGEN stats");
@@ -44,6 +45,9 @@ function createShareUrl(fid: number): string {
 }
 
 export default async function Home({ searchParams }: NextServerPageProps) {
+  const currentUrl = currentURL("").toString();
+  console.log("currentUrl", currentUrl);
+
   const previousFrame = getPreviousFrame<State>(searchParams);
 
   const frameMessage = await getFrameMessage(previousFrame.postBody, {
@@ -72,7 +76,7 @@ export default async function Home({ searchParams }: NextServerPageProps) {
 
   let shareUrl: string | undefined = undefined;
   if (state.page === "STATS" && frameMessage?.requesterFid) {
-    shareUrl = createShareUrl(frameMessage.requesterFid);
+    shareUrl = createShareUrl(baseUrl, frameMessage.requesterFid);
   }
 
   const imageParams = new URLSearchParams({ page: state.page });

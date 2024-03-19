@@ -10,6 +10,20 @@ import { verifySignedUrl } from "../../signer";
 import { getAddressesForFid, getUserDataForFid } from "frames.js";
 import { fetchDegenStats } from "./fetch-degen-stats";
 
+function toUrl(req: NextRequest) {
+  const url = new URL(req.url);
+  if (process.env.NODE_ENV === "development") {
+    return url;
+  }
+  const protocol = req.headers.get("x-forwarded-proto") || "https";
+  const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
+
+  url.protocol = protocol;
+  url.host = host || url.host;
+
+  return url;
+}
+
 function getRequestUrl(req: NextRequest) {
   const url = new URL(req.url);
   const search = url.searchParams.toString();
@@ -26,6 +40,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const start = Date.now();
+  console.log("Request URL:", toUrl(req).toString());
   try {
     const url = verifyUrl(req);
     const params = url.searchParams;
