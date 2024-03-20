@@ -1,7 +1,7 @@
 import { ImageResponse } from "@vercel/og";
 
 import { options } from "../../satori-options";
-import { baseUrl } from "../../constants";
+import { baseUrl as fallbackBaseUrl } from "../../constants";
 import { DegenStats } from "./fetch-degen-stats";
 
 async function toImage(image: React.ReactElement): Promise<ImageResponse> {
@@ -15,6 +15,10 @@ function formatNumber(num: number): string {
 interface UserData {
   displayName?: string;
   profileImage?: string;
+}
+
+interface BaseImageProps {
+  baseUrl?: string;
 }
 
 interface StatsImageProps {
@@ -31,7 +35,10 @@ const FAKE_DATA: DegenStats = {
   minRank: -1,
 };
 
-function ImageLayout({ children }: React.PropsWithChildren) {
+function ImageLayout({
+  children,
+  baseUrl = fallbackBaseUrl,
+}: React.PropsWithChildren & BaseImageProps) {
   return (
     <div tw="w-full h-full relative bg-slate-900 text-4xl text-sky-100 justify-center items-center flex flex-col">
       <div tw="flex w-full h-full p-12" style={{ gap: "3rem" }}>
@@ -156,7 +163,10 @@ function StatsImage(props: StatsImageProps) {
   );
 }
 
-function InitialImage({ message }: { message?: string }) {
+function InitialImage({
+  message,
+  baseUrl = fallbackBaseUrl,
+}: { message?: string } & BaseImageProps) {
   return (
     <div tw="flex w-full h-full relative justify-center items-center">
       <div
@@ -179,37 +189,49 @@ function InitialImage({ message }: { message?: string }) {
   );
 }
 
-export async function generateInitialImage(): Promise<ImageResponse> {
+interface ImageOptions {
+  baseUrl?: string;
+}
+
+export async function generateInitialImage(
+  options: ImageOptions
+): Promise<ImageResponse> {
   return toImage(
-    <ImageLayout>
-      <InitialImage />
+    <ImageLayout baseUrl={options.baseUrl}>
+      <InitialImage baseUrl={options.baseUrl} />
     </ImageLayout>
   );
 }
 
-export async function generateErrorImage({
-  error,
-}: {
-  error: string;
-}): Promise<ImageResponse> {
+export async function generateErrorImage(
+  {
+    error,
+  }: {
+    error: string;
+  },
+  options: ImageOptions
+): Promise<ImageResponse> {
   return toImage(
-    <ImageLayout>
-      <InitialImage message={error} />
+    <ImageLayout baseUrl={options.baseUrl}>
+      <InitialImage message={error} baseUrl={options.baseUrl} />
     </ImageLayout>
   );
 }
 
-export async function generateStatsImage({
-  stats,
-  addresses,
-  userData,
-}: {
-  stats: DegenStats;
-  addresses: string[];
-  userData: UserData;
-}): Promise<ImageResponse> {
+export async function generateStatsImage(
+  {
+    stats,
+    addresses,
+    userData,
+  }: {
+    stats: DegenStats;
+    addresses: string[];
+    userData: UserData;
+  },
+  options: ImageOptions
+): Promise<ImageResponse> {
   return toImage(
-    <ImageLayout>
+    <ImageLayout baseUrl={options.baseUrl}>
       <StatsImage stats={stats} addresses={addresses} userData={userData} />
     </ImageLayout>
   );

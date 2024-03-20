@@ -9,7 +9,7 @@ import {
   useFramesReducer,
 } from "frames.js/next/server";
 import { DEFAULT_DEBUGGER_HUB_URL } from "./debug";
-import { baseUrl } from "./constants";
+// import { baseUrl as fallbackBaseUrl } from "./constants";
 import { signUrl, verifySignedUrl } from "./signer";
 import { currentURL } from "./utils";
 
@@ -45,8 +45,9 @@ function createShareUrl(baseUrl: string, fid: number): string {
 }
 
 export default async function Home({ searchParams }: NextServerPageProps) {
-  const currentUrl = currentURL("").toString();
-  console.log("currentUrl", currentUrl);
+  const currentUrl = currentURL("");
+  console.log("currentUrl", currentUrl.toString());
+  const baseUrl = currentUrl.origin;
 
   const previousFrame = getPreviousFrame<State>(searchParams);
 
