@@ -14,7 +14,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className="min-w-full min-h-dvh flex flex-col items-center justify-center bg-slate-900 text-sky-100 font-degen p-8 text-center">
+        {children}
+        <div className="w-full">
+          $DEGEN stats by{" "}
+          <a
+            href="https://warpcast.com/ds8"
+            className="text-sky-400 hover:underline hover:text-sky-500"
+          >
+            ds8
+          </a>
+        </div>
+      </body>
     </html>
   );
 }

@@ -89,7 +89,7 @@ export default async function Home({ searchParams }: NextServerPageProps) {
   const signedImageUrl = signUrl(imageUrl);
 
   return (
-    <div className="p-4">
+    <div>
       <FrameContainer
         postUrl="/frames"
         pathname="/"

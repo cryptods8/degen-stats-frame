@@ -66,6 +66,16 @@
   }
 }
  
+@font-face {
+  font-family: "Degen";
+  src: url("../public/DegenFont.otf");
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../public/Inter-Regular.ttf");
+}
+
 @layer base {
   * {
     @apply border-border;

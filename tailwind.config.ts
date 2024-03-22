@@ -28,6 +28,10 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        degen: ["Degen", "sans-serif"],
+        inter: ["Inter", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
