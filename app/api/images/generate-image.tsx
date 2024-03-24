@@ -43,7 +43,7 @@ function ImageLayout({
     <div tw="w-full h-full relative bg-slate-900 text-4xl text-sky-100 justify-center items-center flex flex-col">
       <div tw="flex w-full h-full p-12" style={{ gap: "3rem" }}>
         <div
-          tw="flex h-full flex-col items-center w-64"
+          tw="flex h-full flex-col items-center w-48"
           style={{ gap: "2rem" }}
         >
           <div tw="flex flex-1 w-2 bg-violet-500" />
@@ -52,7 +52,7 @@ function ImageLayout({
           </div>
           <div tw="flex flex-1 w-2 bg-violet-500" />
         </div>
-        <div tw="flex flex-1 items-center pr-28">{children}</div>
+        <div tw="flex flex-1 items-center pl-6 pr-20">{children}</div>
       </div>
     </div>
   );
@@ -93,7 +93,7 @@ function StatsSubItem({
   value: string | React.ReactNode;
 }) {
   return (
-    <div tw="flex text-3xl justify-between" style={{ gap: "3rem" }}>
+    <div tw="flex text-4xl justify-between" style={{ gap: "3rem" }}>
       <div tw="flex text-slate-500">{label}</div>
       <div tw="flex text-slate-400">{value}</div>
     </div>
@@ -103,39 +103,44 @@ function StatsSubItem({
 function StatsImage(props: StatsImageProps) {
   const { stats, userData, addresses } = props;
   return (
-    <div tw="flex text-5xl w-full">
-      <div tw="flex flex-col w-full" style={{ gap: "3rem" }}>
-        <div tw="flex items-center" style={{ gap: "2rem" }}>
-          <div tw="flex flex-col relative">
+    <div tw="flex text-6xl w-full">
+      <div tw="flex flex-col w-full" style={{ gap: "3.5rem" }}>
+        <div tw="flex items-center" style={{ gap: "3rem" }}>
+          <div tw="flex flex-col">
             <img
-              tw="w-28 h-28 rounded border-8 border-sky-400"
+              tw="w-36 h-36 rounded border-8 border-sky-400"
               src={userData.profileImage}
               alt="Profile"
               width="112"
               height="112"
             />
           </div>
-          <div tw="flex flex-col" style={{ gap: "0.75rem" }}>
-            <div tw="flex">{userData.displayName}</div>
-            <div tw="flex text-3xl text-slate-400">
-              {addresses.length} address
-              {(addresses.length || 0) > 1 ? "es" : ""}
+          <div tw="flex flex-1 flex-col" style={{ gap: "1rem" }}>
+            <div tw="flex flex-wrap w-full" style={{ wordBreak: "break-all" }}>
+              {userData.displayName}
+            </div>
+            <div tw="flex items-center text-4xl" style={{ gap: "1.5rem" }}>
+              <div tw="flex text-slate-500">Rank</div>
+              <div tw="flex">
+                {stats.minRank === -1 ? (
+                  <div tw="flex text-slate-600">N/A</div>
+                ) : (
+                  <div tw="flex text-lime-400">
+                    {formatNumber(stats.minRank)}
+                  </div>
+                )}
+              </div>
+              <div tw="flex p-4">
+                <div tw="flex bg-slate-700 w-2 h-2 rounded-full" />
+              </div>
+              <div tw="flex text-4xl text-slate-500">
+                {addresses.length} wallet
+                {(addresses.length || 0) > 1 ? "s" : ""}
+              </div>
             </div>
           </div>
         </div>
-        <div tw="flex flex-col text-4xl w-full" style={{ gap: "2rem" }}>
-          <StatsItemContainer>
-            <StatsItem
-              label="Rank"
-              value={
-                stats.minRank === -1 ? (
-                  <div tw="flex text-slate-400">Unranked</div>
-                ) : (
-                  <div tw="flex">{formatNumber(stats.minRank)}</div>
-                )
-              }
-            />
-          </StatsItemContainer>
+        <div tw="flex flex-col text-5xl w-full" style={{ gap: "3rem" }}>
           <StatsItemContainer>
             <StatsItem
               label="Allowance"
@@ -182,7 +187,7 @@ function InitialImage({
           }}
         />
       </div>
-      <div tw="flex absolute bg-lime-900/75 text-lime-400 px-12 py-8 rounded">
+      <div tw="flex absolute bg-lime-900/75 text-lime-400 px-12 py-8 rounded text-5xl">
         {message || "Check your own $DEGEN stats!"}
       </div>
     </div>
