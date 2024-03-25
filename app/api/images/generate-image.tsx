@@ -41,9 +41,9 @@ function ImageLayout({
 }: React.PropsWithChildren & BaseImageProps) {
   return (
     <div tw="w-full h-full relative bg-slate-900 text-4xl text-sky-100 justify-center items-center flex flex-col">
-      <div tw="flex w-full h-full p-12" style={{ gap: "3rem" }}>
+      <div tw="flex w-full h-full py-12">
         <div
-          tw="flex h-full flex-col items-center w-48"
+          tw="flex h-full flex-col items-center w-62"
           style={{ gap: "2rem" }}
         >
           <div tw="flex flex-1 w-2 bg-violet-500" />
@@ -52,7 +52,7 @@ function ImageLayout({
           </div>
           <div tw="flex flex-1 w-2 bg-violet-500" />
         </div>
-        <div tw="flex flex-1 items-center pl-6 pr-20">{children}</div>
+        <div tw="flex flex-1 items-center pr-30">{children}</div>
       </div>
     </div>
   );
@@ -105,7 +105,7 @@ function StatsImage(props: StatsImageProps) {
   return (
     <div tw="flex text-6xl w-full">
       <div tw="flex flex-col w-full" style={{ gap: "3.5rem" }}>
-        <div tw="flex items-center" style={{ gap: "3rem" }}>
+        <div tw="flex items-center w-full" style={{ gap: "3rem" }}>
           <div tw="flex flex-col">
             <img
               tw="w-36 h-36 rounded border-8 border-sky-400"
@@ -116,7 +116,13 @@ function StatsImage(props: StatsImageProps) {
             />
           </div>
           <div tw="flex flex-1 flex-col" style={{ gap: "1rem" }}>
-            <div tw="flex flex-wrap w-full" style={{ wordBreak: "break-all" }}>
+            <div
+              tw="flex w-full overflow-hidden"
+              style={{
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
+              }}
+            >
               {userData.displayName}
             </div>
             <div tw="flex items-center text-4xl" style={{ gap: "1.5rem" }}>
@@ -131,7 +137,7 @@ function StatsImage(props: StatsImageProps) {
                 )}
               </div>
               <div tw="flex p-4">
-                <div tw="flex bg-slate-700 w-2 h-2 rounded-full" />
+                <div tw="flex bg-slate-500 w-2 h-2 rounded-full" />
               </div>
               <div tw="flex text-4xl text-slate-500">
                 {addresses.length} wallet
@@ -187,8 +193,13 @@ function InitialImage({
           }}
         />
       </div>
-      <div tw="flex absolute bg-lime-900/75 text-lime-400 px-12 py-8 rounded text-5xl">
-        {message || "Check your own $DEGEN stats!"}
+      <div tw="flex absolute p-12 items-center justify-center w-full h-full">
+        <div
+          tw="flex flex-wrap px-12 py-8 bg-lime-900/75 text-lime-400 rounded text-5xl text-center"
+          style={{ lineHeight: "1.5" }}
+        >
+          {message || "Check your own $DEGEN stats!"}
+        </div>
       </div>
     </div>
   );

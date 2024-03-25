@@ -39,7 +39,7 @@ function createShareUrl(baseUrl: string, fid: number): string {
   // console.log("signedUrl", signedUrl);
 
   const shareRedirectParams = new URLSearchParams();
-  shareRedirectParams.append("text", "My $DEGEN stats");
+  // shareRedirectParams.append("text", "My $DEGEN stats");
   shareRedirectParams.set("embeds[]", signedUrl);
   return `https://warpcast.com/~/compose?${shareRedirectParams.toString()}`;
 }
