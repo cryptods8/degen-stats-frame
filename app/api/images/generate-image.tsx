@@ -43,7 +43,7 @@ function ImageLayout({
     <div tw="w-full h-full relative bg-slate-900 text-4xl text-sky-100 justify-center items-center flex flex-col">
       <div tw="flex w-full h-full py-12">
         <div
-          tw="flex h-full flex-col items-center w-62"
+          tw="flex h-full flex-col items-center w-78"
           style={{ gap: "2rem" }}
         >
           <div tw="flex flex-1 w-2 bg-violet-500" />
@@ -52,7 +52,7 @@ function ImageLayout({
           </div>
           <div tw="flex flex-1 w-2 bg-violet-500" />
         </div>
-        <div tw="flex flex-1 items-center pr-30">{children}</div>
+        <div tw="flex flex-1 items-center pr-38">{children}</div>
       </div>
     </div>
   );
