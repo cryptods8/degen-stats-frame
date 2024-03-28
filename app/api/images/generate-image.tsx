@@ -108,7 +108,7 @@ function StatsImage(props: StatsImageProps) {
         <div tw="flex items-center w-full" style={{ gap: "3rem" }}>
           <div tw="flex flex-col">
             <img
-              tw="w-36 h-36 rounded border-8 border-sky-400"
+              tw="w-36 h-36 rounded border-8 border-sky-400 bg-white"
               src={userData.profileImage}
               alt="Profile"
               width="112"
