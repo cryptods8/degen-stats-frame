@@ -52,12 +52,16 @@ export default async function Home({ searchParams }: NextServerPageProps) {
   const previousFrame = getPreviousFrame<State>(searchParams);
 
   const frameMessage = await getFrameMessage(previousFrame.postBody, {
-    fetchHubContext: false,
     hubHttpUrl:
       process.env.NODE_ENV === "development"
         ? DEFAULT_DEBUGGER_HUB_URL
         : undefined,
   });
+
+  if (frameMessage && !frameMessage.isValid) {
+    console.warn("Invalid frame message", frameMessage);
+    throw new Error("Invalid frame message");
+  }
 
   const [state] = useFramesReducer<State>(reducer, initialState, previousFrame);
 
