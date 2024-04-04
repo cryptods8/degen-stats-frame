@@ -44,6 +44,11 @@ function createShareUrl(baseUrl: string, fid: number): string {
   return `https://warpcast.com/~/compose?${shareRedirectParams.toString()}`;
 }
 
+const hubHttpUrl =
+  process.env.NODE_ENV === "development"
+    ? DEFAULT_DEBUGGER_HUB_URL
+    : process.env.DEBUGGER_HUB_URL ?? undefined;
+
 export default async function Home({ searchParams }: NextServerPageProps) {
   const currentUrl = currentURL("");
   console.log("currentUrl", currentUrl.toString());
@@ -52,10 +57,7 @@ export default async function Home({ searchParams }: NextServerPageProps) {
   const previousFrame = getPreviousFrame<State>(searchParams);
 
   const frameMessage = await getFrameMessage(previousFrame.postBody, {
-    hubHttpUrl:
-      process.env.NODE_ENV === "development"
-        ? DEFAULT_DEBUGGER_HUB_URL
-        : undefined,
+    hubHttpUrl,
   });
 
   if (frameMessage && !frameMessage.isValid) {
