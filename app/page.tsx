@@ -47,7 +47,11 @@ function createShareUrl(baseUrl: string, fid: number): string {
 const hubHttpUrl =
   process.env.NODE_ENV === "development"
     ? DEFAULT_DEBUGGER_HUB_URL
-    : process.env.DEBUGGER_HUB_URL ?? undefined;
+    : "https://hubs.airstack.xyz";
+const hubRequestOptions =
+  process.env.NODE_ENV === "development"
+    ? undefined
+    : { headers: { "x-airstack-hubs": process.env.AIRSTACK_API_KEY! } };
 
 export default async function Home({ searchParams }: NextServerPageProps) {
   const currentUrl = currentURL("");
@@ -58,6 +62,7 @@ export default async function Home({ searchParams }: NextServerPageProps) {
 
   const frameMessage = await getFrameMessage(previousFrame.postBody, {
     hubHttpUrl,
+    hubRequestOptions,
   });
 
   if (frameMessage && !frameMessage.isValid) {
