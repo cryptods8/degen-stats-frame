@@ -12,6 +12,28 @@ function formatNumber(num: number): string {
   return num.toLocaleString("en-US");
 }
 
+const MINUTE_MILLIS = 60 * 1000;
+const HOUR_MILLIS = 60 * MINUTE_MILLIS;
+const DAY_MILLIS = 24 * HOUR_MILLIS;
+
+function formatExpiration(): string {
+  const now = new Date();
+  let expiry = new Date();
+  expiry.setUTCHours(7, 35, 0, 0);
+  if (expiry.getTime() < now.getTime()) {
+    expiry = new Date(expiry.getTime() + DAY_MILLIS);
+  }
+  const diff = expiry.getTime() - now.getTime();
+  console.log("EXPIRY", expiry.toUTCString());
+  console.log("NOW", now.toUTCString());
+  const hours = Math.floor(diff / HOUR_MILLIS);
+  const minutes = Math.floor((diff % HOUR_MILLIS) / MINUTE_MILLIS);
+  if (hours > 0) {
+    return `🕒 ${hours}h ${minutes}m`;
+  }
+  return `🕒 ${minutes}m`;
+}
+
 interface UserData {
   displayName?: string;
   profileImage?: string;
@@ -104,7 +126,7 @@ function StatsImage(props: StatsImageProps) {
   const { stats, userData, addresses } = props;
   return (
     <div tw="flex text-6xl w-full">
-      <div tw="flex flex-col w-full" style={{ gap: "3.5rem" }}>
+      <div tw="flex flex-col w-full" style={{ gap: "3rem" }}>
         <div tw="flex items-center w-full" style={{ gap: "3rem" }}>
           <div tw="flex flex-col">
             <img
@@ -146,7 +168,7 @@ function StatsImage(props: StatsImageProps) {
             </div>
           </div>
         </div>
-        <div tw="flex flex-col text-5xl w-full" style={{ gap: "3rem" }}>
+        <div tw="flex flex-col text-5xl w-full" style={{ gap: "2rem" }}>
           <StatsItemContainer>
             <StatsItem
               label="Allowance"
@@ -156,6 +178,7 @@ function StatsImage(props: StatsImageProps) {
               label="- remaining"
               value={formatNumber(stats.remainingAllowance)}
             />
+            <StatsSubItem label="- expires in" value={formatExpiration()} />
           </StatsItemContainer>
           <StatsItemContainer>
             <StatsItem
