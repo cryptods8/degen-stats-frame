@@ -27,7 +27,7 @@ const tipAllowanceApi: TipAllowanceDegenApi = {
   path: "/api/airdrop2/tip-allowance",
 };
 const liquidityMiningApi: PointsDegenApi = {
-  path: "/api/liquidity-mining/season2/points",
+  path: "/api/liquidity-mining/season3/points",
 };
 
 async function fetchDegenData<T extends BaseDegenResponseItem>(
