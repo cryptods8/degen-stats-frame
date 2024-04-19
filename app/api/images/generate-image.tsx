@@ -64,9 +64,9 @@ function ImageLayout({
 }: React.PropsWithChildren & BaseImageProps) {
   return (
     <div tw="w-full h-full relative bg-slate-900 text-4xl text-sky-100 justify-center items-center flex flex-col">
-      <div tw="flex flex-col w-full h-full px-24">
-        <div tw="flex w-full items-center h-78" style={{ gap: "3rem" }}>
-          <div tw="flex flex-1 h-2 bg-violet-500" />
+      <div tw="flex flex-col w-full h-full">
+        <div tw="flex w-full items-center pt-24 pb-12" style={{ gap: "3rem" }}>
+          <div tw="flex w-26 h-2 bg-violet-500" />
           <div tw="flex">
             <img
               src={`${baseUrl}/hat.png`}
@@ -77,7 +77,15 @@ function ImageLayout({
           </div>
           <div tw="flex flex-1 h-2 bg-violet-500" />
         </div>
-        <div tw="flex flex-1 items-center pb-38">{children}</div>
+        <div tw="flex items-center px-24">{children}</div>
+        <div
+          tw="flex w-full items-center pt-24 text-violet-500"
+          style={{ gap: "3rem" }}
+        >
+          <div tw="flex w-26 h-2 bg-violet-500" />
+          <div tw="flex">DEGEN STATS</div>
+          <div tw="flex flex-1 h-2 bg-violet-500" />
+        </div>
       </div>
     </div>
   );
