@@ -138,7 +138,9 @@ function ProgressBar({ value, maxValue }: { value: number; maxValue: number }) {
   return (
     <div tw="flex items-center justify-end w-full h-18 bg-slate-700 rounded-full relative text-5xl">
       <div
-        tw="flex h-full bg-lime-600 rounded-full"
+        tw={`flex h-full bg-lime-600 rounded-full ${
+          value > 0 ? "min-w-18" : ""
+        }`}
         style={{ width: `${percentage}%` }}
       />
       <div tw="flex absolute right-0 top-0 bottom-0 items-center px-8 justify-between w-full">
