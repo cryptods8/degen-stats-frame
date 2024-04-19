@@ -1,3 +1,5 @@
+import { fetchAllDailyTips } from "./fetch-tips";
+
 const API_BASE_URL = "https://www.degen.tips";
 
 type DegenResponse<T extends BaseDegenResponseItem> = T[];
@@ -61,7 +63,31 @@ function combinePoints(
   }, 0);
 }
 
-export async function fetchDegenStats(walletAddresses: string[]): Promise<DegenStats> {
+async function getValidTips(fid: number, tipAllowance: number) {
+  try {
+    const start = Date.now();
+    const dailyTips = await fetchAllDailyTips(fid);
+    console.log(`Time for fetchAllDailyTips: ${Date.now() - start}ms`);
+    // return = 19100;
+    return [...dailyTips]
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .reduce((acc, tip) => {
+        if (acc + tip.value > tipAllowance) {
+          return acc;
+        }
+        acc += tip.value;
+        return acc;
+      }, 0);
+  } catch (e) {
+    console.error(e);
+    return 0;
+  }
+}
+
+export async function fetchDegenStats(
+  fid: number,
+  walletAddresses: string[]
+): Promise<DegenStats> {
   const allApiFetches = [tipAllowanceApi, pointsApi, liquidityMiningApi].map(
     async (api) => fetchDegenData(api, walletAddresses)
   );
@@ -88,5 +114,10 @@ export async function fetchDegenStats(walletAddresses: string[]): Promise<DegenS
   const pointsLiquidityMining = combinePoints(
     liquidityMiningRes as DegenResponse<PointsDegenResponseItem>[] | undefined
   );
-  return { ...res, points, pointsLiquidityMining };
+  const validTips = await getValidTips(fid, res.tipAllowance);
+  const remainingAllowance = Math.min(
+    res.remainingAllowance,
+    Math.max(0, res.tipAllowance - validTips)
+  );
+  return { ...res, remainingAllowance, points, pointsLiquidityMining };
 }

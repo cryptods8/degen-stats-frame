@@ -107,7 +107,7 @@ export default async function Home({ searchParams }: NextServerPageProps) {
         state={state}
         previousFrame={previousFrame}
       >
-        <FrameImage src={signedImageUrl} />
+        <FrameImage src={signedImageUrl} aspectRatio="1:1" />
         <FrameButton>
           {state.page === "INITIAL"
             ? fid

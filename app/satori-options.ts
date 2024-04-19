@@ -41,6 +41,6 @@ export const fonts: Font[] = [
 
 export const options: SatoriOptions = {
   width: 1200,
-  height: 628,
+  height: 1200,
   fonts,
 };

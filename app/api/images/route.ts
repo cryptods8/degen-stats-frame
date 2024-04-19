@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
       return acc;
     }, [] as string[]);
     const userData = (await getUserDataForFid({ fid })) || {};
-    const stats = await fetchDegenStats(addresses);
+    const stats = await fetchDegenStats(fid, addresses);
 
     return generateStatsImage({ stats, addresses, userData }, imageOptions);
   } catch (e) {
