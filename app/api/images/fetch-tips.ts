@@ -26,7 +26,7 @@ interface AirstackCast {
   parentFid: string;
 }
 
-const TIP_REGEX = /(\d+)\s*\$degen/i;
+const TIP_REGEX = /(\d+) \$degen/i;
 
 function mergeTips(oldTips: DailyTip[], newTips: DailyTip[]): DailyTip[] {
   const mergedTips = [...oldTips];
