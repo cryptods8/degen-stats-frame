@@ -134,7 +134,7 @@ function StatsSubItem({
 }
 
 function ProgressBar({ value, maxValue }: { value: number; maxValue: number }) {
-  const percentage = (value / maxValue) * 100;
+  const percentage = maxValue === 0 ? 0 : (value / maxValue) * 100;
   return (
     <div tw="flex items-center justify-end w-full h-18 bg-slate-700 rounded-full relative text-5xl">
       <div
