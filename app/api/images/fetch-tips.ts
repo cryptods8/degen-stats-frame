@@ -127,7 +127,7 @@ export async function fetchAllDailyTips(fid: number): Promise<DailyTip[]> {
   const newCasts = await fetchCastsFromTimestamp(fid, from);
   const newTips = newCasts.reduce((acc, c) => {
     const match = c.text.match(TIP_REGEX);
-    if (match && match[1]) {
+    if (match && match[1] && c.parentFid && c.parentFid !== "0") {
       acc.push({
         hash: c.hash,
         tipperFid: fid,
