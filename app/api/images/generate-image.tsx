@@ -3,7 +3,7 @@ import { ImageResponse } from "@vercel/og";
 import { options } from "../../satori-options";
 import { baseUrl as fallbackBaseUrl } from "../../constants";
 import { DegenStats } from "./fetch-degen-stats";
-import { getDailyAllowanceStart } from "./utils";
+import { addDays, getDailyAllowanceStart } from "./utils";
 
 async function toImage(image: React.ReactElement): Promise<ImageResponse> {
   return new ImageResponse(image, options);
@@ -19,7 +19,7 @@ const DAY_MILLIS = 24 * HOUR_MILLIS;
 
 function getExpirationInMillis(): number {
   const now = new Date();
-  const expiry = new Date(getDailyAllowanceStart().getTime() + DAY_MILLIS);
+  const expiry = addDays(getDailyAllowanceStart(), 1);
   return expiry.getTime() - now.getTime();
 }
 
@@ -29,7 +29,10 @@ function formatExpiration(expirationInMillis: number): string {
     (expirationInMillis % HOUR_MILLIS) / MINUTE_MILLIS
   );
   if (hours > 0) {
-    return `${hours}h ${minutes}m`;
+    if (minutes > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${hours}h`;
   }
   return `${minutes}m`;
 }

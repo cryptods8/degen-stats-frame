@@ -115,7 +115,7 @@ export async function fetchAllDailyTips(fid: number): Promise<DailyTip[]> {
       from = dailyAllowanceStart;
     } else {
       // 60 minutes before just in case some casts are delayed
-      const fromTimestamp = timestamp - 60 * 60 * 1000;
+      const fromTimestamp = timestamp - 30 * 60 * 1000;
       from = new Date(Math.max(fromTimestamp, dailyAllowanceStart.getTime()));
       cachedTips = value.tips;
     }
