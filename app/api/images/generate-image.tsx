@@ -164,7 +164,7 @@ function ProgressCircle({
   const progressCircumference = 2 * Math.PI * progressRadius;
   const progressLength = (1 - ratio) * progressCircumference;
   return (
-    <div tw="flex items-center justify-end w-10 h-10 bg-slate-700 rounded-full relative text-lime-600">
+    <div tw="flex items-center justify-end w-12 h-12 bg-slate-700 rounded-full relative text-lime-600">
       <svg
         width={"3rem"}
         height={"3rem"}
