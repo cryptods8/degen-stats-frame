@@ -20,7 +20,7 @@ type State = {
   // ts?: number;
 };
 
-const initialState: State = { page: "STATS" };
+const initialState: State = { page: "INITIAL" };
 
 const reducer: FrameReducer<State> = () => {
   return {
@@ -51,8 +51,8 @@ const hubRequestOptions =
     : { headers: { "x-airstack-hubs": process.env.AIRSTACK_API_KEY! } };
 
 export default async function Home({ searchParams }: NextServerPageProps) {
-  const currentUrl = currentURL("");
-  console.log("currentUrl", currentUrl.toString());
+  const currentUrl = currentURL("/allowance");
+  console.log("currentUrl", currentUrl.toString(), searchParams);
   const baseUrl = currentUrl.origin;
 
   const previousFrame = getPreviousFrame<State>(searchParams);
@@ -73,7 +73,7 @@ export default async function Home({ searchParams }: NextServerPageProps) {
   let fid: number | undefined = undefined;
   if (fidParam && state.page === "INITIAL") {
     const params = new URLSearchParams(searchParams as Record<string, string>);
-    const fullUrl = `${baseUrl}/?${params.toString()}`;
+    const fullUrl = `${baseUrl}/allowance?${params.toString()}`;
     try {
       verifySignedUrl(fullUrl);
       fid = parseInt(fidParam as string, 10);
