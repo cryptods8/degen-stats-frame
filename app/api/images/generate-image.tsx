@@ -2,11 +2,17 @@ import { ImageResponse } from "@vercel/og";
 
 import { options } from "../../satori-options";
 import { baseUrl as fallbackBaseUrl } from "../../constants";
-import { DegenStats } from "./fetch-degen-stats";
+import { DegenAllowanceStats, DegenStats } from "./fetch-degen-stats";
 import { addDays, getDailyAllowanceStart } from "./utils";
 
-async function toImage(image: React.ReactElement): Promise<ImageResponse> {
-  return new ImageResponse(image, options);
+async function toImage(
+  image: React.ReactElement,
+  ratio?: "1:1" | "1.91:1"
+): Promise<ImageResponse> {
+  return new ImageResponse(image, {
+    ...options,
+    height: ratio === "1.91:1" ? 628 : 1200,
+  });
 }
 
 function formatNumber(num: number): string {
@@ -47,8 +53,8 @@ interface BaseImageProps {
   baseUrl?: string;
 }
 
-interface StatsImageProps {
-  stats: DegenStats;
+interface StatsImageProps<T extends DegenAllowanceStats> {
+  stats: T;
   userData: UserData;
   addresses: string[];
 }
@@ -61,36 +67,74 @@ const FAKE_DATA: DegenStats = {
   minRank: -1,
 };
 
+function BaseImageLayout({ children }: React.PropsWithChildren) {
+  return (
+    <div tw="w-full h-full relative bg-slate-900 text-4xl text-sky-100 justify-center items-center flex flex-col">
+      {children}
+    </div>
+  );
+}
+
+function HatPanel({
+  baseUrl = fallbackBaseUrl,
+  vertical = false,
+  compact = false,
+}: {
+  baseUrl?: string;
+  vertical?: boolean;
+  compact?: boolean;
+}) {
+  return (
+    <div
+      tw={`flex items-center ${
+        vertical ? "flex-col h-full pl-20 py-12" : "w-full pt-24 pb-12"
+      }`}
+      style={{ gap: "3rem" }}
+    >
+      <div tw={`flex bg-violet-500 ${vertical ? "flex-1 w-2" : "w-26 h-2"}`} />
+      <div tw="flex">
+        <img
+          src={`${baseUrl}/hat.png`}
+          alt="hat"
+          width={compact ? "85" : "130"}
+          height={compact ? "72" : "110"}
+        />
+      </div>
+      <div tw={`flex flex-1 bg-violet-500 ${vertical ? "w-2" : "h-2"}`} />
+    </div>
+  );
+}
+
 function ImageLayout({
   children,
   baseUrl = fallbackBaseUrl,
-}: React.PropsWithChildren & BaseImageProps) {
+  compact = false,
+}: React.PropsWithChildren & BaseImageProps & { compact?: boolean }) {
   return (
-    <div tw="w-full h-full relative bg-slate-900 text-4xl text-sky-100 justify-center items-center flex flex-col">
-      <div tw="flex flex-col w-full h-full">
-        <div tw="flex w-full items-center pt-24 pb-12" style={{ gap: "3rem" }}>
-          <div tw="flex w-26 h-2 bg-violet-500" />
-          <div tw="flex">
-            <img
-              src={`${baseUrl}/hat.png`}
-              alt="hat"
-              width="130"
-              height="110"
-            />
-          </div>
-          <div tw="flex flex-1 h-2 bg-violet-500" />
-        </div>
-        <div tw="flex items-center px-24">{children}</div>
+    <BaseImageLayout>
+      <div
+        tw={`flex w-full h-full ${
+          compact ? "flex-row items-center justify-center" : "flex-col"
+        }`}
+      >
+        <HatPanel baseUrl={baseUrl} compact={compact} vertical={compact} />
         <div
-          tw="flex w-full items-center pt-24 text-violet-500"
-          style={{ gap: "3rem" }}
+          tw={`flex items-center ${compact ? "flex-1 pl-16 pr-20" : "px-24"}`}
         >
-          <div tw="flex w-26 h-2 bg-violet-500" />
-          <div tw="flex">DEGEN STATS</div>
-          <div tw="flex flex-1 h-2 bg-violet-500" />
+          {children}
         </div>
+        {!compact && (
+          <div
+            tw="flex w-full items-center pt-24 text-violet-500"
+            style={{ gap: "3rem" }}
+          >
+            <div tw="flex w-26 h-2 bg-violet-500" />
+            <div tw="flex">DEGEN STATS</div>
+            <div tw="flex flex-1 h-2 bg-violet-500" />
+          </div>
+        )}
       </div>
-    </div>
+    </BaseImageLayout>
   );
 }
 
@@ -194,75 +238,79 @@ function ProgressCircle({
   );
 }
 
-function StatsImage(props: StatsImageProps) {
-  const { stats, userData, addresses } = props;
+function StatsHeader(props: {
+  userData: UserData;
+  addresses: string[];
+  stats: DegenAllowanceStats;
+}) {
+  const { userData, addresses, stats } = props;
+  return (
+    <div tw="flex items-center w-full px-8" style={{ gap: "4rem" }}>
+      <div tw="flex flex-col">
+        <img
+          tw="w-44 h-44 rounded border-8 border-sky-400 bg-white"
+          src={userData.profileImage}
+          alt="Profile"
+          width="112"
+          height="112"
+        />
+      </div>
+      <div tw="flex flex-1 flex-col" style={{ gap: "1rem" }}>
+        <div
+          tw="flex w-full overflow-hidden"
+          style={{
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {userData.username ? `@${userData.username}` : userData.displayName}
+        </div>
+        <div
+          tw="flex items-center justify-between text-5xl"
+          style={{ gap: "2rem" }}
+        >
+          <div tw="flex" style={{ gap: "2rem" }}>
+            <div tw="flex text-slate-500">Rank</div>
+            <div tw="flex">
+              {stats.minRank === -1 ? (
+                <div tw="flex text-slate-600">N/A</div>
+              ) : (
+                <div tw="flex text-lime-400">{formatNumber(stats.minRank)}</div>
+              )}
+            </div>
+          </div>
+          {/* <div tw="flex p-4">
+                <div tw="flex bg-slate-500 w-2 h-2 rounded-full" />
+              </div> */}
+          <div tw="flex items-center text-slate-500" style={{ gap: "2rem" }}>
+            <div tw="flex">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512"
+                width="2.5rem"
+                height="2.5rem"
+              >
+                <path
+                  d="M461.2 128H80c-8.84 0-16-7.16-16-16s7.16-16 16-16h384c8.84 0 16-7.16 16-16 0-26.51-21.49-48-48-48H64C28.65 32 0 60.65 0 96v320c0 35.35 28.65 64 64 64h397.2c28.02 0 50.8-21.53 50.8-48V176c0-26.47-22.78-48-50.8-48zM416 336c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32z"
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+            <div tw="flex">{addresses.length}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatsImage(props: StatsImageProps<DegenStats>) {
+  const { stats } = props;
   const expirationInMillis = getExpirationInMillis();
   return (
     <div tw="flex text-7xl w-full">
       <div tw="flex flex-col w-full" style={{ gap: "5.5rem" }}>
-        <div tw="flex items-center w-full px-8" style={{ gap: "4rem" }}>
-          <div tw="flex flex-col">
-            <img
-              tw="w-44 h-44 rounded border-8 border-sky-400 bg-white"
-              src={userData.profileImage}
-              alt="Profile"
-              width="112"
-              height="112"
-            />
-          </div>
-          <div tw="flex flex-1 flex-col" style={{ gap: "1rem" }}>
-            <div
-              tw="flex w-full overflow-hidden"
-              style={{
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {userData.username
-                ? `@${userData.username}`
-                : userData.displayName}
-            </div>
-            <div
-              tw="flex items-center justify-between text-5xl"
-              style={{ gap: "2rem" }}
-            >
-              <div tw="flex" style={{ gap: "2rem" }}>
-                <div tw="flex text-slate-500">Rank</div>
-                <div tw="flex">
-                  {stats.minRank === -1 ? (
-                    <div tw="flex text-slate-600">N/A</div>
-                  ) : (
-                    <div tw="flex text-lime-400">
-                      {formatNumber(stats.minRank)}
-                    </div>
-                  )}
-                </div>
-              </div>
-              {/* <div tw="flex p-4">
-                <div tw="flex bg-slate-500 w-2 h-2 rounded-full" />
-              </div> */}
-              <div
-                tw="flex items-center text-slate-500"
-                style={{ gap: "2rem" }}
-              >
-                <div tw="flex">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 512 512"
-                    width="2.5rem"
-                    height="2.5rem"
-                  >
-                    <path
-                      d="M461.2 128H80c-8.84 0-16-7.16-16-16s7.16-16 16-16h384c8.84 0 16-7.16 16-16 0-26.51-21.49-48-48-48H64C28.65 32 0 60.65 0 96v320c0 35.35 28.65 64 64 64h397.2c28.02 0 50.8-21.53 50.8-48V176c0-26.47-22.78-48-50.8-48zM416 336c-17.67 0-32-14.33-32-32s14.33-32 32-32 32 14.33 32 32-14.33 32-32 32z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                </div>
-                <div tw="flex">{addresses.length}</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <StatsHeader {...props} />
         <div tw="flex flex-col text-6xl w-full" style={{ gap: "4rem" }}>
           <StatsItemContainer>
             <StatsItem
@@ -273,10 +321,6 @@ function StatsImage(props: StatsImageProps) {
               value={stats.remainingAllowance}
               maxValue={stats.tipAllowance}
             />
-            {/* <StatsSubItem
-              label="- remaining"
-              value={formatNumber(stats.remainingAllowance)}
-            /> */}
             <StatsSubItem
               label="- expires in"
               value={
@@ -307,25 +351,56 @@ function StatsImage(props: StatsImageProps) {
   );
 }
 
-function InitialImage({
+function AllowanceStatsImage(props: StatsImageProps<DegenAllowanceStats>) {
+  const { stats } = props;
+  const expirationInMillis = getExpirationInMillis();
+  return (
+    <div tw="flex text-7xl w-full">
+      <div tw="flex flex-col w-full" style={{ gap: "4rem" }}>
+        <StatsHeader {...props} />
+        <div tw="flex flex-col text-6xl w-full" style={{ gap: "4rem" }}>
+          <StatsItemContainer>
+            <StatsItem
+              label="Allowance"
+              value={formatNumber(stats.tipAllowance)}
+            />
+            <ProgressBar
+              value={stats.remainingAllowance}
+              maxValue={stats.tipAllowance}
+            />
+            <StatsSubItem
+              label="- expires in"
+              value={
+                <div tw="flex items-center" style={{ gap: "2rem" }}>
+                  <ProgressCircle
+                    value={DAY_MILLIS - expirationInMillis}
+                    maxValue={DAY_MILLIS}
+                  />
+                  <div tw="flex">{formatExpiration(expirationInMillis)}</div>
+                </div>
+              }
+            />
+          </StatsItemContainer>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InitialImageLayout({
+  statsImage,
   message,
-  baseUrl = fallbackBaseUrl,
-}: { message?: string } & BaseImageProps) {
+}: {
+  statsImage: React.ReactNode;
+  message?: string;
+}) {
   return (
     <div tw="flex w-full h-full relative justify-center items-center">
       <div
         tw="flex w-full h-full justify-center items-center"
         style={{ opacity: 0.5 }}
       >
-        <StatsImage
-          stats={FAKE_DATA}
-          addresses={["0x12345", "0x45678"]}
-          userData={{
-            username: "madhatter",
-            displayName: "mad hatter 🎩",
-            profileImage: `${baseUrl}/mad_hatter.jpg`,
-          }}
-        />
+        {statsImage}
       </div>
       <div tw="flex absolute p-12 items-center justify-center w-full h-full">
         <div
@@ -339,8 +414,56 @@ function InitialImage({
   );
 }
 
+function AllowanceInitialImage({
+  message,
+  baseUrl = fallbackBaseUrl,
+}: { message?: string } & BaseImageProps) {
+  return (
+    <InitialImageLayout
+      statsImage={
+        <AllowanceStatsImage
+          stats={FAKE_DATA}
+          addresses={["0x12345", "0x45678"]}
+          userData={{
+            username: "madhatter",
+            displayName: "mad hatter 🎩",
+            profileImage: `${baseUrl}/mad_hatter.jpg`,
+          }}
+        />
+      }
+      message={message}
+    />
+  );
+}
+
+function InitialImage({
+  message,
+  baseUrl = fallbackBaseUrl,
+}: { message?: string } & BaseImageProps) {
+  return (
+    <InitialImageLayout
+      statsImage={
+        <StatsImage
+          stats={FAKE_DATA}
+          addresses={["0x12345", "0x45678"]}
+          userData={{
+            username: "madhatter",
+            displayName: "mad hatter 🎩",
+            profileImage: `${baseUrl}/mad_hatter.jpg`,
+          }}
+        />
+      }
+      message={message}
+    />
+  );
+}
+
 interface ImageOptions {
   baseUrl?: string;
+}
+
+async function toAllowanceImage(image: React.ReactElement) {
+  return toImage(image, "1.91:1");
 }
 
 export async function generateInitialImage(
@@ -349,6 +472,19 @@ export async function generateInitialImage(
   return toImage(
     <ImageLayout baseUrl={options.baseUrl}>
       <InitialImage baseUrl={options.baseUrl} />
+    </ImageLayout>
+  );
+}
+
+export async function generateAllowanceInitialImage(
+  options: ImageOptions
+): Promise<ImageResponse> {
+  return toAllowanceImage(
+    <ImageLayout baseUrl={options.baseUrl} compact>
+      <AllowanceInitialImage
+        baseUrl={options.baseUrl}
+        message="Check your own $DEGEN allowance!"
+      />
     </ImageLayout>
   );
 }
@@ -368,21 +504,39 @@ export async function generateErrorImage(
   );
 }
 
-export async function generateStatsImage(
+export async function generateAllowanceErrorImage(
   {
-    stats,
-    addresses,
-    userData,
+    error,
   }: {
-    stats: DegenStats;
-    addresses: string[];
-    userData: UserData;
+    error: string;
   },
+  options: ImageOptions
+): Promise<ImageResponse> {
+  return toAllowanceImage(
+    <ImageLayout baseUrl={options.baseUrl} compact>
+      <AllowanceInitialImage message={error} baseUrl={options.baseUrl} />
+    </ImageLayout>
+  );
+}
+
+export async function generateStatsImage(
+  props: StatsImageProps<DegenStats>,
   options: ImageOptions
 ): Promise<ImageResponse> {
   return toImage(
     <ImageLayout baseUrl={options.baseUrl}>
-      <StatsImage stats={stats} addresses={addresses} userData={userData} />
+      <StatsImage {...props} />
+    </ImageLayout>
+  );
+}
+
+export async function generateAllowanceStatsImage(
+  props: StatsImageProps<DegenAllowanceStats>,
+  options: ImageOptions
+): Promise<ImageResponse> {
+  return toAllowanceImage(
+    <ImageLayout baseUrl={options.baseUrl} compact>
+      <AllowanceStatsImage {...props} />
     </ImageLayout>
   );
 }

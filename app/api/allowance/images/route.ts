@@ -1,13 +1,13 @@
 import { NextRequest } from "next/server";
 
 import {
-  generateInitialImage,
-  generateErrorImage,
-  generateStatsImage,
-} from "./generate-image";
+  generateAllowanceInitialImage,
+  generateAllowanceErrorImage,
+  generateAllowanceStatsImage,
+} from "../../images/generate-image";
 import { getAddressesForFid, getUserDataForFid } from "frames.js";
-import { fetchDegenStats } from "./fetch-degen-stats";
-import { toUrl, verifyUrl } from "./utils";
+import { fetchDegenAllowanceStats } from "../../images/fetch-degen-stats";
+import { toUrl, verifyUrl } from "../../images/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     const params = url.searchParams;
     const fidStr = params.get("fid");
     if (!fidStr) {
-      return generateInitialImage(imageOptions);
+      return generateAllowanceInitialImage(imageOptions);
     }
 
     const fid = parseInt(fidStr, 10);
@@ -33,12 +33,12 @@ export async function GET(req: NextRequest) {
       return acc;
     }, [] as string[]);
     const userData = (await getUserDataForFid({ fid })) || {};
-    const stats = await fetchDegenStats(fid, addresses);
+    const stats = await fetchDegenAllowanceStats(fid, addresses);
 
-    return generateStatsImage({ stats, addresses, userData }, imageOptions);
+    return generateAllowanceStatsImage({ stats, addresses, userData }, imageOptions);
   } catch (e) {
     console.error(e);
-    return generateErrorImage(
+    return generateAllowanceErrorImage(
       {
         error: "Error occured: " + (e as any).message,
       },

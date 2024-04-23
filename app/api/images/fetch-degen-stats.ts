@@ -1,4 +1,4 @@
-import { fetchAllDailyTips } from "./fetch-tips";
+import { DailyTip, fetchAllDailyTips } from "./fetch-tips";
 
 const API_BASE_URL = "https://www.degen.tips";
 
@@ -44,12 +44,15 @@ async function fetchDegenData<T extends BaseDegenResponseItem>(
   return Promise.all(allFetches);
 }
 
-export interface DegenStats {
+export interface DegenAllowanceStats {
   minRank: number;
-  points: number;
-  pointsLiquidityMining: number;
   tipAllowance: number;
   remainingAllowance: number;
+}
+
+export interface DegenStats extends DegenAllowanceStats {
+  points: number;
+  pointsLiquidityMining: number;
 }
 
 function combinePoints(
@@ -63,40 +66,34 @@ function combinePoints(
   }, 0);
 }
 
-async function getValidTips(fid: number, tipAllowance: number) {
+async function fetchDailyTips(fid: number) {
   try {
     const start = Date.now();
     const dailyTips = await fetchAllDailyTips(fid);
     console.log(`Time for fetchAllDailyTips: ${Date.now() - start}ms`);
-    // return = 19100;
-    return [...dailyTips]
-      .sort((a, b) => a.timestamp - b.timestamp)
-      .reduce((acc, tip) => {
-        if (acc + tip.value > tipAllowance) {
-          return acc;
-        }
-        acc += tip.value;
-        return acc;
-      }, 0);
+    return dailyTips;
   } catch (e) {
     console.error(e);
-    return 0;
+    return [];
   }
 }
 
-export async function fetchDegenStats(
-  fid: number,
-  walletAddresses: string[]
-): Promise<DegenStats> {
-  const allApiFetches = [tipAllowanceApi, pointsApi, liquidityMiningApi].map(
-    async (api) => fetchDegenData(api, walletAddresses)
-  );
-  const [tipAllowanceRes, pointsRes, liquidityMiningRes] = await Promise.all(
-    allApiFetches
-  );
-  const res = (
-    (tipAllowanceRes as DegenResponse<TipAllowanceDegenResponseItem>[]) || []
-  ).reduce(
+function getValidTips(tips: DailyTip[], tipAllowance: number) {
+  return [...tips]
+    .sort((a, b) => a.timestamp - b.timestamp)
+    .reduce((acc, tip) => {
+      if (acc + tip.value > tipAllowance) {
+        return acc;
+      }
+      acc += tip.value;
+      return acc;
+    }, 0);
+}
+
+function combineTipAllowance(
+  responses: DegenResponse<TipAllowanceDegenResponseItem>[]
+): DegenAllowanceStats {
+  return responses.reduce(
     (acc, curr) => {
       if (curr[0]) {
         acc.tipAllowance += parseInt(curr[0].tip_allowance);
@@ -108,13 +105,46 @@ export async function fetchDegenStats(
     },
     { tipAllowance: 0, remainingAllowance: 0, minRank: -1 }
   );
+}
+
+export async function fetchDegenAllowanceStats(
+  fid: number,
+  walletAddresses: string[]
+): Promise<DegenAllowanceStats> {
+  const [tipAllowanceRes, dailyTips] = await Promise.all([
+    fetchDegenData(tipAllowanceApi, walletAddresses),
+    fetchDailyTips(fid),
+  ]);
+  const res = combineTipAllowance(
+    (tipAllowanceRes as DegenResponse<TipAllowanceDegenResponseItem>[]) || []
+  );
+  const validTips = getValidTips(dailyTips as DailyTip[], res.tipAllowance);
+  const remainingAllowance = Math.min(
+    res.remainingAllowance,
+    Math.max(0, res.tipAllowance - validTips)
+  );
+  return { ...res, remainingAllowance };
+}
+
+export async function fetchDegenStats(
+  fid: number,
+  walletAddresses: string[]
+): Promise<DegenStats> {
+  const allApiFetches = [tipAllowanceApi, pointsApi, liquidityMiningApi].map(
+    async (api) => fetchDegenData(api, walletAddresses)
+  );
+  const [tipAllowanceRes, pointsRes, liquidityMiningRes, dailyTips] =
+    await Promise.all([...allApiFetches, fetchDailyTips(fid)]);
+  const res = combineTipAllowance(
+    (tipAllowanceRes as DegenResponse<TipAllowanceDegenResponseItem>[]) || []
+  );
   const points = combinePoints(
     pointsRes as DegenResponse<PointsDegenResponseItem>[] | undefined
   );
   const pointsLiquidityMining = combinePoints(
     liquidityMiningRes as DegenResponse<PointsDegenResponseItem>[] | undefined
   );
-  const validTips = await getValidTips(fid, res.tipAllowance);
+  const validTips = getValidTips(dailyTips as DailyTip[], res.tipAllowance);
   const remainingAllowance = Math.min(
     res.remainingAllowance,
     Math.max(0, res.tipAllowance - validTips)
