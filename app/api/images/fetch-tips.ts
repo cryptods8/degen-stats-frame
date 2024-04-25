@@ -93,7 +93,7 @@ export async function fetchAllDailyTips(fid: number): Promise<DailyTip[]> {
   const cacheKey = `daily-tips-${fid}`;
   const cacheEntry = await fetchFromCache<TipsCacheEntry>(cacheKey);
   const dailyAllowanceStart = getDailyAllowanceStart();
-  let from;
+  let from = dailyAllowanceStart;
   let cachedTips: DailyTip[] = [];
   if (cacheEntry && cacheEntry.value?.tips) {
     const { timestamp, value } = cacheEntry;
@@ -111,13 +111,13 @@ export async function fetchAllDailyTips(fid: number): Promise<DailyTip[]> {
     ) {
       return value.tips;
     }
-    if (value.from < dailyAllowanceStart.getTime()) {
-      from = dailyAllowanceStart;
-    } else {
+    if (value.from >= dailyAllowanceStart.getTime()) {
       // 60 minutes before just in case some casts are delayed
-      const fromTimestamp = timestamp - 30 * 60 * 1000;
+      const fromTimestamp = timestamp - 60 * 60 * 1000;
       from = new Date(Math.max(fromTimestamp, dailyAllowanceStart.getTime()));
       cachedTips = value.tips;
+    } else {
+      console.info("cached value invalid", cacheKey);
     }
   } else {
     console.info("no cached tips", cacheKey);

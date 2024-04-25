@@ -107,6 +107,14 @@ function combineTipAllowance(
   );
 }
 
+function getRemainingAllowance(
+  stats: DegenAllowanceStats,
+  validTips: number
+): number {
+  // return Math.min(stats.remainingAllowance, Math.max(0, stats.tipAllowance - validTips));
+  return Math.max(0, stats.tipAllowance - validTips);
+}
+
 export async function fetchDegenAllowanceStats(
   fid: number,
   walletAddresses: string[]
@@ -119,10 +127,7 @@ export async function fetchDegenAllowanceStats(
     (tipAllowanceRes as DegenResponse<TipAllowanceDegenResponseItem>[]) || []
   );
   const validTips = getValidTips(dailyTips as DailyTip[], res.tipAllowance);
-  const remainingAllowance = Math.min(
-    res.remainingAllowance,
-    Math.max(0, res.tipAllowance - validTips)
-  );
+  const remainingAllowance = getRemainingAllowance(res, validTips);
   return { ...res, remainingAllowance };
 }
 
@@ -145,9 +150,6 @@ export async function fetchDegenStats(
     liquidityMiningRes as DegenResponse<PointsDegenResponseItem>[] | undefined
   );
   const validTips = getValidTips(dailyTips as DailyTip[], res.tipAllowance);
-  const remainingAllowance = Math.min(
-    res.remainingAllowance,
-    Math.max(0, res.tipAllowance - validTips)
-  );
+  const remainingAllowance = getRemainingAllowance(res, validTips);
   return { ...res, remainingAllowance, points, pointsLiquidityMining };
 }
