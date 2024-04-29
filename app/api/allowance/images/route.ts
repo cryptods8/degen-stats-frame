@@ -13,9 +13,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const start = Date.now();
-  const imageOptions = {
-    baseUrl: "https://stats-frame.degen.tips",
-  };
+  const imageOptions = {};
   console.log("Request URL:", toUrl(req).toString());
   try {
     const url = verifyUrl(req);
