@@ -7,14 +7,13 @@ import {
 } from "../../images/generate-image";
 import { getAddressesForFid, getUserDataForFid } from "frames.js";
 import { fetchDegenAllowanceStats } from "../../images/fetch-degen-stats";
-import { toUrl, verifyUrl } from "../../images/utils";
+import { verifyUrl } from "../../images/utils";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const start = Date.now();
   const imageOptions = {};
-  console.log("Request URL:", toUrl(req).toString());
   try {
     const url = verifyUrl(req);
     const params = url.searchParams;

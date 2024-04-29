@@ -302,6 +302,7 @@ function StatsHeader(props: {
           style={{
             whiteSpace: "nowrap",
             textOverflow: "ellipsis",
+            lineHeight: "1.25",
           }}
         >
           {userData.username ? `@${userData.username}` : userData.displayName}
