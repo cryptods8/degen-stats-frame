@@ -50,7 +50,11 @@ const handleRequest = frames(async (ctx) => {
         action="post"
         target={{ query: isAllowance ? { p: "/allowance" } : {} }}
       >
-        {requesterFid ? "Refresh" : fid ? "Check my own stats" : "Check"}
+        {requesterFid
+          ? "Refresh"
+          : isAllowance
+          ? "Check my own allowance"
+          : "Check my own stats"}
       </Button>,
       shareUrl ? (
         <Button action="link" target={shareUrl}>

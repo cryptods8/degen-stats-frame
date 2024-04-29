@@ -13,12 +13,12 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const start = Date.now();
+  const imageOptions = {
+    baseUrl: "https://stats-frame.degen.tips",
+  };
   console.log("Request URL:", toUrl(req).toString());
   try {
     const url = verifyUrl(req);
-    const imageOptions = {
-      baseUrl: url.origin,
-    };
     const params = url.searchParams;
     const fidStr = params.get("fid");
     if (!fidStr) {
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       {
         error: "Error occured: " + (e as any).message,
       },
-      {}
+      imageOptions
     );
   } finally {
     console.log(`Time for GET /api/images: ${Date.now() - start}ms`);

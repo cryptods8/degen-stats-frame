@@ -60,10 +60,10 @@ interface StatsImageProps<T extends DegenAllowanceStats> {
 }
 
 const FAKE_DATA: DegenStats = {
-  tipAllowance: 42069,
-  remainingAllowance: 1337,
-  points: 123456,
-  pointsLiquidityMining: 42000000,
+  tipAllowance: 4269,
+  remainingAllowance: 1420,
+  points: 1234,
+  pointsLiquidityMining: 200,
   minRank: -1,
 };
 
@@ -281,14 +281,20 @@ function StatsHeader(props: {
   const { userData, addresses, stats } = props;
   return (
     <div tw="flex items-center w-full px-8" style={{ gap: "4rem" }}>
-      <div tw="flex flex-col">
-        <img
-          tw="w-44 h-44 rounded border-8 border-sky-400 bg-white"
-          src={userData.profileImage}
-          alt="Profile"
-          width="112"
-          height="112"
-        />
+      <div tw="flex w-44 h-44 rounded border-8 border-sky-400 bg-white">
+        {userData.profileImage ? (
+          <img
+            tw="w-full h-full"
+            src={userData.profileImage}
+            alt="Profile"
+            width="112"
+            height="112"
+          />
+        ) : (
+          <div tw="flex w-full h-full items-center justify-center text-8xl bg-violet-500 text-violet-800">
+            ?
+          </div>
+        )}
       </div>
       <div tw="flex flex-1 flex-col" style={{ gap: "1rem" }}>
         <div
@@ -433,18 +439,20 @@ function InitialImageLayout({
     <div tw="flex w-full h-full relative justify-center items-center">
       <div
         tw="flex w-full h-full justify-center items-center"
-        style={{ opacity: 0.5 }}
+        style={{ opacity: message ? 0.5 : 1 }}
       >
         {statsImage}
       </div>
-      <div tw="flex absolute p-12 items-center justify-center w-full h-full">
-        <div
-          tw="flex flex-wrap px-12 py-8 bg-lime-900/75 text-lime-400 rounded text-5xl text-center"
-          style={{ lineHeight: "1.5" }}
-        >
-          {message || "Check your own $DEGEN stats!"}
+      {message && (
+        <div tw="flex absolute p-12 items-center justify-center w-full h-full">
+          <div
+            tw="flex flex-wrap px-12 py-8 bg-lime-900 shadow-xl text-lime-400 rounded text-5xl text-center"
+            style={{ lineHeight: "1.5" }}
+          >
+            {message}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -516,10 +524,7 @@ export async function generateAllowanceInitialImage(
 ): Promise<ImageResponse> {
   return toAllowanceImage(
     <ImageLayout baseUrl={options.baseUrl} compact>
-      <AllowanceInitialImage
-        baseUrl={options.baseUrl}
-        message="Check your own $DEGEN allowance!"
-      />
+      <AllowanceInitialImage baseUrl={options.baseUrl} />
     </ImageLayout>
   );
 }

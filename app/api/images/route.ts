@@ -6,20 +6,19 @@ import {
   generateStatsImage,
 } from "./generate-image";
 import { getAddressesForFid, getUserDataForFid } from "frames.js";
-import { DegenStats, fetchDegenStats } from "./fetch-degen-stats";
+import { fetchDegenStats } from "./fetch-degen-stats";
 import { toUrl, verifyUrl } from "./utils";
-import { baseUrl } from "../../constants";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const start = Date.now();
   console.log("Request URL:", toUrl(req).toString());
+  const imageOptions = {
+    baseUrl: "https://degen-stats.vercel.app",
+  };
   try {
     const url = verifyUrl(req);
-    const imageOptions = {
-      baseUrl: url.origin,
-    };
     const params = url.searchParams;
     const fidStr = params.get("fid");
     if (!fidStr) {
@@ -59,7 +58,7 @@ export async function GET(req: NextRequest) {
       {
         error: "Error occured: " + (e as any).message,
       },
-      {}
+      imageOptions
     );
   } finally {
     console.log(`Time for GET /api/images: ${Date.now() - start}ms`);
