@@ -39,7 +39,7 @@ export function verifyUrl(req: NextRequest) {
     console.info("Verified URL", verifiedUrl);
   } catch (e) {
     // TODO: remove when verified it works
-    console.error("Error verifying URL", url, (e as any).message);
+    console.warn("Error verifying URL", url, (e as any).message);
   }
   return new URL(verifiedUrl);
 }

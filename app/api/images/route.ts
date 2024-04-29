@@ -6,8 +6,9 @@ import {
   generateStatsImage,
 } from "./generate-image";
 import { getAddressesForFid, getUserDataForFid } from "frames.js";
-import { fetchDegenStats } from "./fetch-degen-stats";
+import { DegenStats, fetchDegenStats } from "./fetch-degen-stats";
 import { toUrl, verifyUrl } from "./utils";
+import { baseUrl } from "../../constants";
 
 export const dynamic = "force-dynamic";
 
@@ -32,10 +33,26 @@ export async function GET(req: NextRequest) {
       }
       return acc;
     }, [] as string[]);
-    const userData = (await getUserDataForFid({ fid })) || {};
-    const stats = await fetchDegenStats(fid, addresses);
+    const [userData, stats] = await Promise.all([
+      getUserDataForFid({ fid }),
+      fetchDegenStats(fid, addresses),
+    ]);
+    // const stats: DegenStats = {
+    //   minRank: 24,
+    //   points: 100015,
+    //   pointsLiquidityMining: 125120,
+    //   remainingAllowance: -1500,
+    //   tipAllowance: 20500,
+    // };
+    // const userData = {
+    //   username: "ds8",
+    //   profileImage: `${baseUrl}/mad_hatter.jpg`,
+    // };
 
-    return generateStatsImage({ stats, addresses, userData }, imageOptions);
+    return generateStatsImage(
+      { stats, addresses, userData: userData ?? {} },
+      imageOptions
+    );
   } catch (e) {
     console.error(e);
     return generateErrorImage(

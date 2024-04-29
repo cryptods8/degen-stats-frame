@@ -32,10 +32,15 @@ export async function GET(req: NextRequest) {
       }
       return acc;
     }, [] as string[]);
-    const userData = (await getUserDataForFid({ fid })) || {};
-    const stats = await fetchDegenAllowanceStats(fid, addresses);
+    const [userData, stats] = await Promise.all([
+      getUserDataForFid({ fid }),
+      fetchDegenAllowanceStats(fid, addresses),
+    ]);
 
-    return generateAllowanceStatsImage({ stats, addresses, userData }, imageOptions);
+    return generateAllowanceStatsImage(
+      { stats, addresses, userData: userData ?? {} },
+      imageOptions
+    );
   } catch (e) {
     console.error(e);
     return generateAllowanceErrorImage(
