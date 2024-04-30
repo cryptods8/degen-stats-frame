@@ -16,7 +16,10 @@ export async function generateMetadata({
     queryParams.set("signed", searchParams.signed as string);
   }
 
-  const framesUrl = currentURL(`${basePath}?${queryParams.toString()}`);
+  const paramsString = queryParams.toString();
+  const framesUrl = currentURL(
+    `${basePath}${paramsString ? `?${paramsString}` : ""}`
+  );
   const other = await fetchMetadata(framesUrl);
   return {
     title: "Degen Stats by ds8",

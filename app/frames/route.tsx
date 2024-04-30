@@ -48,7 +48,10 @@ const handleRequest = frames(async (ctx) => {
     buttons: [
       <Button
         action="post"
-        target={{ query: isAllowance ? { p: "/allowance" } : {} }}
+        target={{
+          pathname: "/",
+          query: isAllowance ? { p: "/allowance" } : {},
+        }}
       >
         {requesterFid
           ? "Refresh"
