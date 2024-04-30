@@ -317,7 +317,7 @@ function StatsHeader(props: {
               {stats.minRank === -1 ? (
                 <div tw="flex text-slate-600">N/A</div>
               ) : (
-                <div tw="flex text-lime-400">{formatNumber(stats.minRank)}</div>
+                <div tw="flex text-lime-500">{formatNumber(stats.minRank)}</div>
               )}
             </div>
           </div>
