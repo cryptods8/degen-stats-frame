@@ -17,6 +17,7 @@ const handleRequest = frames(async (ctx) => {
   let fid: number | undefined = undefined;
   if (fidParam && !requesterFid) {
     const params = new URLSearchParams(searchParams as Record<string, string>);
+    params.delete("p");
     const fullUrl = `${baseUrl}${path}?${params.toString()}`;
     try {
       verifySignedUrl(fullUrl);
