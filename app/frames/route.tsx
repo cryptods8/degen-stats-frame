@@ -5,13 +5,27 @@ import { signUrl, verifySignedUrl } from "../signer";
 import { createShareUrl } from "../utils";
 import { baseUrl } from "../constants";
 
+function constructCastActionUrl(params: { url: string }): string {
+  // Construct the URL
+  const baseUrl = "https://warpcast.com/~/add-cast-action";
+  const urlParams = new URLSearchParams({
+    url: params.url,
+  });
+
+  return `${baseUrl}?${urlParams.toString()}`;
+}
+
 const handleRequest = frames(async (ctx) => {
   const { message, validationResult, searchParams } = ctx;
   const isAllowance = searchParams.p === "/allowance";
+  const isCastAction = searchParams.ca === "1";
+  const isSelf = searchParams.self === "1";
   const path = isAllowance ? "/allowance" : "";
 
   const requesterFid = validationResult?.isValid
-    ? message?.requesterFid
+    ? isCastAction && !isSelf
+      ? message?.castId?.fid
+      : message?.requesterFid
     : undefined;
   const fidParam = searchParams.fid;
   let fid: number | undefined = undefined;
@@ -29,7 +43,7 @@ const handleRequest = frames(async (ctx) => {
   }
 
   let shareUrl: string | undefined = undefined;
-  if (requesterFid) {
+  if (requesterFid && requesterFid === message?.requesterFid) {
     shareUrl = createShareUrl(path, requesterFid);
   }
 
@@ -43,6 +57,18 @@ const handleRequest = frames(async (ctx) => {
   const imageUrl = `${baseUrl}/api${path}/images?${imageParams.toString()}`;
   const signedImageUrl = signUrl(imageUrl);
 
+  const buttonQuery: Record<string, string> = {};
+  if (isAllowance) {
+    buttonQuery.p = "/allowance";
+  }
+  if (isCastAction) {
+    buttonQuery.ca = "1";
+  }
+
+  const actionLink = `${baseUrl}/api/actions/${
+    isAllowance ? "allowance" : "stats"
+  }`;
+
   return {
     image: signedImageUrl,
     imageOptions: { aspectRatio: isAllowance ? "1.91:1" : "1:1" },
@@ -51,7 +77,7 @@ const handleRequest = frames(async (ctx) => {
         action="post"
         target={{
           pathname: "/",
-          query: isAllowance ? { p: "/allowance" } : {},
+          query: buttonQuery,
         }}
       >
         {requesterFid
@@ -60,6 +86,21 @@ const handleRequest = frames(async (ctx) => {
           ? "Check my own allowance"
           : "Check my own stats"}
       </Button>,
+      isCastAction ? (
+        <Button
+          action="post"
+          target={{ pathname: "/", query: { ...buttonQuery, self: "1" } }}
+        >
+          {isSelf ? "Refresh mine" : "Check mine"}
+        </Button>
+      ) : (
+        <Button
+          action="link"
+          target={constructCastActionUrl({ url: actionLink })}
+        >
+          Install cast action
+        </Button>
+      ),
       shareUrl ? (
         <Button action="link" target={shareUrl}>
           Share
