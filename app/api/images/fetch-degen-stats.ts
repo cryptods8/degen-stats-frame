@@ -20,6 +20,7 @@ interface TipAllowanceDegenResponseItem extends BaseDegenResponseItem {
 
 type DegenApi<T extends BaseDegenResponseItem> = {
   path: string;
+  fetchByFid?: boolean;
 };
 type PointsDegenApi = DegenApi<PointsDegenResponseItem>;
 type TipAllowanceDegenApi = DegenApi<TipAllowanceDegenResponseItem>;
@@ -29,6 +30,7 @@ const pointsApi: PointsDegenApi = {
 };
 const tipAllowanceApi: TipAllowanceDegenApi = {
   path: "/api/airdrop2/tip-allowance",
+  fetchByFid: true,
 };
 const liquidityMiningApi: PointsDegenApi = {
   path: "/api/liquidity-mining/season3/points",
@@ -36,13 +38,16 @@ const liquidityMiningApi: PointsDegenApi = {
 
 async function fetchDegenData<T extends BaseDegenResponseItem>(
   api: DegenApi<T>,
+  fid: number,
   walletAddresses: string[]
 ): Promise<DegenResponse<T>[]> {
-  const allFetches = walletAddresses.map((walletAddress) =>
-    fetch(`${API_BASE_URL}${api.path}?address=${walletAddress}`).then((res) =>
-      res.json()
-    )
-  );
+  const allFetches = api.fetchByFid
+    ? [fetch(`${API_BASE_URL}${api.path}?fid=${fid}`).then((res) => res.json())]
+    : walletAddresses.map((walletAddress) =>
+        fetch(`${API_BASE_URL}${api.path}?address=${walletAddress}`).then(
+          (res) => res.json()
+        )
+      );
   return Promise.all(allFetches);
 }
 
@@ -142,7 +147,7 @@ export async function fetchDegenAllowanceStats(
   walletAddresses: string[]
 ): Promise<DegenAllowanceStats> {
   const [tipAllowanceRes, dailyTips] = await Promise.all([
-    fetchDegenData(tipAllowanceApi, walletAddresses),
+    fetchDegenData(tipAllowanceApi, fid, walletAddresses),
     getAllTips(fid),
   ]);
   const res = combineTipAllowance(
@@ -157,7 +162,7 @@ export async function fetchDegenStats(
   walletAddresses: string[]
 ): Promise<DegenStats> {
   const allApiFetches = [tipAllowanceApi, pointsApi, liquidityMiningApi].map(
-    async (api) => fetchDegenData(api, walletAddresses)
+    async (api) => fetchDegenData(api, fid, walletAddresses)
   );
   const [tipAllowanceRes, pointsRes, liquidityMiningRes, dailyTips] =
     await Promise.all([...allApiFetches, getAllTips(fid)]);
