@@ -65,6 +65,10 @@ const FAKE_DATA: DegenStats = {
   points: 1234,
   pointsLiquidityMining: 200,
   minRank: -1,
+  raindropBalance: {
+    total: 100,
+    remaining: 50,
+  },
 };
 
 function WarningIcon() {
@@ -108,7 +112,7 @@ function HatPanel({
   return (
     <div
       tw={`flex items-center ${
-        vertical ? "flex-col h-full pl-20 py-12" : "w-full pt-24 pb-12"
+        vertical ? "flex-col h-full pl-20 py-12" : "w-full pt-16 pb-12"
       }`}
       style={{ gap: "3rem" }}
     >
@@ -144,7 +148,7 @@ function ImageLayout({
         >
           {children}
         </div>
-        {!compact && (
+        {/* {!compact && false && (
           <div
             tw="flex w-full items-center pt-24 text-violet-500"
             style={{ gap: "3rem" }}
@@ -153,7 +157,7 @@ function ImageLayout({
             <div tw="flex">DEGEN STATS</div>
             <div tw="flex flex-1 h-2 bg-violet-500" />
           </div>
-        )}
+        )} */}
       </div>
     </BaseImageLayout>
   );
@@ -201,13 +205,21 @@ function StatsSubItem({
   );
 }
 
-function ProgressBar({ value, maxValue }: { value: number; maxValue: number }) {
+function ProgressBar({
+  value,
+  maxValue,
+  variant,
+}: {
+  value: number;
+  maxValue: number;
+  variant?: "violet";
+}) {
   const percentage = maxValue === 0 ? 0 : (value / maxValue) * 100;
   return (
     <div tw="flex items-center justify-end w-full h-18 bg-slate-700 rounded-full relative text-5xl">
       <div
-        tw={`flex h-full bg-lime-600 rounded-full ${
-          value > 0 ? "min-w-18" : ""
+        tw={`flex h-full rounded-full ${value > 0 ? "min-w-18" : ""} ${
+          variant === "violet" ? "bg-violet-500" : "bg-lime-600"
         }`}
         style={{ width: `${percentage}%` }}
       />
@@ -287,8 +299,8 @@ function StatsHeader(props: {
             tw="w-full h-full"
             src={userData.profileImage}
             alt="Profile"
-            width="112"
-            height="112"
+            width="160"
+            height="160"
           />
         ) : (
           <div tw="flex w-full h-full items-center justify-center text-8xl bg-violet-500 text-violet-800">
@@ -351,9 +363,9 @@ function StatsImage(props: StatsImageProps<DegenStats>) {
   const expirationInMillis = getExpirationInMillis();
   return (
     <div tw="flex text-7xl w-full">
-      <div tw="flex flex-col w-full" style={{ gap: "5.5rem" }}>
+      <div tw="flex flex-col w-full" style={{ gap: "5rem" }}>
         <StatsHeader {...props} />
-        <div tw="flex flex-col text-6xl w-full" style={{ gap: "4rem" }}>
+        <div tw="flex flex-col text-6xl w-full" style={{ gap: "3.75rem" }}>
           <StatsItemContainer>
             <StatsItem
               label="Allowance"
@@ -382,10 +394,30 @@ function StatsImage(props: StatsImageProps<DegenStats>) {
               value={formatNumber(stats.points + stats.pointsLiquidityMining)}
             />
             <StatsSubItem label="- tips" value={formatNumber(stats.points)} />
-            <StatsSubItem
+            {/* <StatsSubItem
               label="- liquidity mining"
               value={formatNumber(stats.pointsLiquidityMining)}
+            /> */}
+          </StatsItemContainer>
+          <StatsItemContainer>
+            <StatsItem
+              label="Raindrop balance"
+              value={
+                stats.raindropBalance.total != null
+                  ? formatNumber(stats.raindropBalance.total)
+                  : "N/A"
+              }
             />
+            {stats.raindropBalance.total == null ||
+            stats.raindropBalance.remaining == null ? (
+              <StatsSubItem label="- remaining" value={"N/A"} />
+            ) : (
+              <ProgressBar
+                variant="violet"
+                value={stats.raindropBalance.remaining || 0}
+                maxValue={stats.raindropBalance.total || 0}
+              />
+            )}
           </StatsItemContainer>
         </div>
       </div>

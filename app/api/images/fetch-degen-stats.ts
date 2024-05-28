@@ -1,4 +1,8 @@
 import { pgDb } from "../../db/pg-db";
+import {
+  RaindropBalance,
+  fetchRaindropBalance,
+} from "../fetch-raindrop-balance";
 import { DailyTip, fetchAllDailyTips } from "./fetch-tips";
 import { getDailyAllowanceStart } from "./utils";
 
@@ -60,6 +64,7 @@ export interface DegenAllowanceStats {
 export interface DegenStats extends DegenAllowanceStats {
   points: number;
   pointsLiquidityMining: number;
+  raindropBalance: RaindropBalance;
 }
 
 function combinePoints(
@@ -89,10 +94,16 @@ async function getAllTipsFromDb(fid: number): Promise<number> {
   try {
     const from = getDailyAllowanceStart();
     const res = await pgDb
-      .selectFrom("degen_tip")
-      .where("fromFid", "=", fid.toString())
-      .where("castTimestamp", ">=", from)
-      .select((db) => db.fn.sum("value").as("total"))
+      .selectFrom((db) =>
+        db
+          .selectFrom("degen_tip")
+          .where("fromFid", "=", fid.toString())
+          .where("castTimestamp", ">=", from)
+          .select((db) => db.fn.max("value").as("value"))
+          .groupBy("castHash")
+          .as("udt")
+      )
+      .select((db) => db.fn.sum("udt.value").as("total"))
       .executeTakeFirst();
     return Number(res?.total) || 0;
   } catch (e) {
@@ -164,8 +175,17 @@ export async function fetchDegenStats(
   const allApiFetches = [tipAllowanceApi, pointsApi, liquidityMiningApi].map(
     async (api) => fetchDegenData(api, fid, walletAddresses)
   );
-  const [tipAllowanceRes, pointsRes, liquidityMiningRes, dailyTips] =
-    await Promise.all([...allApiFetches, getAllTips(fid)]);
+  const [
+    tipAllowanceRes,
+    pointsRes,
+    liquidityMiningRes,
+    dailyTips,
+    raindropBalance,
+  ] = await Promise.all([
+    ...allApiFetches,
+    getAllTips(fid),
+    fetchRaindropBalance({ fid, addresses: walletAddresses }),
+  ]);
   const res = combineTipAllowance(
     (tipAllowanceRes as DegenResponse<TipAllowanceDegenResponseItem>[]) || []
   );
@@ -176,5 +196,11 @@ export async function fetchDegenStats(
     liquidityMiningRes as DegenResponse<PointsDegenResponseItem>[] | undefined
   );
   const remainingAllowance = getRemainingAllowance(res, dailyTips as number);
-  return { ...res, remainingAllowance, points, pointsLiquidityMining };
+  return {
+    ...res,
+    remainingAllowance,
+    points,
+    pointsLiquidityMining,
+    raindropBalance: raindropBalance as RaindropBalance,
+  };
 }
