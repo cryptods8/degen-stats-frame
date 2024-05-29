@@ -30,7 +30,7 @@ type PointsDegenApi = DegenApi<PointsDegenResponseItem>;
 type TipAllowanceDegenApi = DegenApi<TipAllowanceDegenResponseItem>;
 
 const pointsApi: PointsDegenApi = {
-  path: "/api/airdrop2/season4/points",
+  path: "/api/airdrop2/season5/points",
 };
 const tipAllowanceApi: TipAllowanceDegenApi = {
   path: "/api/airdrop2/tip-allowance",
