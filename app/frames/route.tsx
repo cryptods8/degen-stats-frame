@@ -43,9 +43,11 @@ const handleRequest = frames(async (ctx) => {
   }
 
   let shareUrl: string | undefined = undefined;
-  let tipUrl: string | undefined = undefined;
   if (requesterFid && requesterFid === message?.requesterFid) {
     shareUrl = createShareUrl(path, requesterFid);
+  }
+  let tipUrl: string | undefined = undefined;
+  if (requesterFid) {
     tipUrl = "https://warpcast.com/ds8/0x3a3d159f";
   }
 
