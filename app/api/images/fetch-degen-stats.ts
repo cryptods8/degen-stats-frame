@@ -3,6 +3,7 @@ import {
   RaindropBalance,
   fetchRaindropBalance,
 } from "../fetch-raindrop-balance";
+import { fetchAllowanceFromEdit } from "./fetch-allowance-from-edit";
 import { DailyTip, fetchAllDailyTips } from "./fetch-tips";
 import { getDailyAllowanceStart } from "./utils";
 
@@ -153,12 +154,11 @@ function getRemainingAllowance(
 const getAllTips =
   process.env.TIPS_DATASOURCE === "db" ? getAllTipsFromDb : getAllTipsFromApi;
 
-export async function fetchDegenAllowanceStats(
-  fid: number,
-  walletAddresses: string[]
-): Promise<DegenAllowanceStats> {
+// const getAllowanceData;
+
+async function getAllowanceDataFromOfficialApi(fid: number) {
   const [tipAllowanceRes, dailyTips] = await Promise.all([
-    fetchDegenData(tipAllowanceApi, fid, walletAddresses),
+    fetchDegenData(tipAllowanceApi, fid, []),
     getAllTips(fid),
   ]);
   const res = combineTipAllowance(
@@ -168,37 +168,47 @@ export async function fetchDegenAllowanceStats(
   return { ...res, remainingAllowance };
 }
 
+async function getAllowanceDataFromEdit(fid: number) {
+  const tipAllowanceRes = await fetchAllowanceFromEdit(fid);
+  return tipAllowanceRes
+    ? {
+        tipAllowance: tipAllowanceRes.tip_allowance,
+        remainingAllowance: tipAllowanceRes.remaining_allowance,
+        minRank: tipAllowanceRes.user_rank,
+      }
+    : { tipAllowance: 0, remainingAllowance: 0, minRank: -1 };
+}
+
+const getAllowanceData = getAllowanceDataFromEdit;
+
+export async function fetchDegenAllowanceStats(
+  fid: number,
+  walletAddresses: string[]
+): Promise<DegenAllowanceStats> {
+  return await getAllowanceData(fid);
+}
+
 export async function fetchDegenStats(
   fid: number,
   walletAddresses: string[]
 ): Promise<DegenStats> {
-  const allApiFetches = [tipAllowanceApi, pointsApi, liquidityMiningApi].map(
-    async (api) => fetchDegenData(api, fid, walletAddresses)
+  const allApiFetches = [pointsApi, liquidityMiningApi].map(async (api) =>
+    fetchDegenData(api, fid, walletAddresses)
   );
-  const [
-    tipAllowanceRes,
-    pointsRes,
-    liquidityMiningRes,
-    dailyTips,
-    raindropBalance,
-  ] = await Promise.all([
-    ...allApiFetches,
-    getAllTips(fid),
-    fetchRaindropBalance({ fid, addresses: walletAddresses }),
-  ]);
-  const res = combineTipAllowance(
-    (tipAllowanceRes as DegenResponse<TipAllowanceDegenResponseItem>[]) || []
-  );
+  const [pointsRes, liquidityMiningRes, allowanceRes, raindropBalance] =
+    await Promise.all([
+      ...allApiFetches,
+      getAllowanceData(fid),
+      fetchRaindropBalance({ fid, addresses: walletAddresses }),
+    ]);
   const points = combinePoints(
     pointsRes as DegenResponse<PointsDegenResponseItem>[] | undefined
   );
   const pointsLiquidityMining = combinePoints(
     liquidityMiningRes as DegenResponse<PointsDegenResponseItem>[] | undefined
   );
-  const remainingAllowance = getRemainingAllowance(res, dailyTips as number);
   return {
-    ...res,
-    remainingAllowance,
+    ...(allowanceRes as DegenAllowanceStats),
     points,
     pointsLiquidityMining,
     raindropBalance: raindropBalance as RaindropBalance,
