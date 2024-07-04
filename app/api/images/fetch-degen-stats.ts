@@ -25,13 +25,15 @@ interface TipAllowanceDegenResponseItem extends BaseDegenResponseItem {
 
 type DegenApi<T extends BaseDegenResponseItem> = {
   path: string;
+  full?: boolean;
   fetchByFid?: boolean;
 };
 type PointsDegenApi = DegenApi<PointsDegenResponseItem>;
 type TipAllowanceDegenApi = DegenApi<TipAllowanceDegenResponseItem>;
 
 const pointsApi: PointsDegenApi = {
-  path: "/api/airdrop2/season5/points",
+  path: "https://api.degen.tips/airdrop2/current/points",
+  full: true,
 };
 const tipAllowanceApi: TipAllowanceDegenApi = {
   path: "/api/airdrop2/tip-allowance",
@@ -41,17 +43,23 @@ const liquidityMiningApi: PointsDegenApi = {
   path: "/api/liquidity-mining/season4/points",
 };
 
+function getApiBasePath(api: DegenApi<any>) {
+  return api.full ? api.path : `${API_BASE_URL}${api.path}`;
+}
+
 async function fetchDegenData<T extends BaseDegenResponseItem>(
   api: DegenApi<T>,
   fid: number,
   walletAddresses: string[]
 ): Promise<DegenResponse<T>[]> {
   const allFetches = api.fetchByFid
-    ? [fetch(`${API_BASE_URL}${api.path}?fid=${fid}`).then((res) => res.json())]
+    ? [fetch(`${getApiBasePath(api)}?fid=${fid}`).then((res) => res.json())]
     : walletAddresses.map((walletAddress) =>
-        fetch(`${API_BASE_URL}${api.path}?address=${walletAddress}`).then(
-          (res) => res.json()
-        )
+        fetch(
+          `${getApiBasePath(api)}?${
+            api.full ? "wallet" : "address"
+          }=${walletAddress}`
+        ).then((res) => res.json())
       );
   return Promise.all(allFetches);
 }
