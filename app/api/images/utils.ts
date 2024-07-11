@@ -10,7 +10,7 @@ export function addDays(date: Date, days: number): Date {
 export function getDailyAllowanceStart(): Date {
   const now = new Date();
   let allowanceStart = new Date(now);
-  allowanceStart.setUTCHours(0, 0, 0, 0);
+  allowanceStart.setUTCHours(0, 5, 0, 0);
   if (allowanceStart.getTime() > now.getTime()) {
     allowanceStart = addDays(allowanceStart, -1);
   }
