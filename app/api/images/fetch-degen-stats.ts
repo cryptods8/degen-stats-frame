@@ -180,9 +180,15 @@ async function getAllowanceDataFromEdit(fid: number) {
   const tipAllowanceRes = await fetchAllowanceFromEdit(fid);
   return tipAllowanceRes
     ? {
-        tipAllowance: tipAllowanceRes.tip_allowance,
-        remainingAllowance: tipAllowanceRes.remaining_allowance,
-        minRank: tipAllowanceRes.user_rank,
+        tipAllowance: tipAllowanceRes.tip_allowance
+          ? parseInt(tipAllowanceRes.tip_allowance, 10)
+          : 0,
+        remainingAllowance: tipAllowanceRes.remaining_tip_allowance
+          ? parseInt(tipAllowanceRes.remaining_tip_allowance, 10)
+          : 0,
+        minRank: tipAllowanceRes.user_rank
+          ? parseInt(tipAllowanceRes.user_rank, 10)
+          : -1,
       }
     : { tipAllowance: 0, remainingAllowance: 0, minRank: -1 };
 }

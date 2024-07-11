@@ -1,14 +1,11 @@
 const tipAllowanceApiUrl = "https://www.degentip.me/api/get_allowance";
 
 export interface AllowanceFromEdit {
-  tip_allowance: number;
-  remaining_allowance: number;
-  avatar_url: string;
-  display_name: string;
-  fname: string;
-  user_rank: number;
-  fid: number;
-  snapshot_date: string;
+  tip_allowance: string;
+  remaining_tip_allowance: string;
+  user_rank: string;
+  fid: string;
+  snapshot_day: string;
 }
 
 interface Response {
