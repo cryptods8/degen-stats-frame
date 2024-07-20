@@ -183,8 +183,8 @@ async function getAllowanceDataFromEdit(fid: number) {
         tipAllowance: tipAllowanceRes.tip_allowance
           ? parseInt(tipAllowanceRes.tip_allowance, 10)
           : 0,
-        remainingAllowance: tipAllowanceRes.remaining_tip_allowance
-          ? parseInt(tipAllowanceRes.remaining_tip_allowance, 10)
+        remainingAllowance: tipAllowanceRes.remaining_allowance
+          ? parseInt(tipAllowanceRes.remaining_allowance, 10)
           : 0,
         minRank: tipAllowanceRes.user_rank
           ? parseInt(tipAllowanceRes.user_rank, 10)
