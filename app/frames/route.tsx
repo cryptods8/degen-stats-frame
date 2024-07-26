@@ -16,13 +16,13 @@ function constructCastActionUrl(params: { url: string }): string {
 }
 
 const handleRequest = frames(async (ctx) => {
-  const { message, validationResult, searchParams } = ctx;
+  const { message, searchParams } = ctx;
   const isAllowance = searchParams.p === "/allowance";
   const isCastAction = searchParams.ca === "1";
   const isSelf = searchParams.self === "1";
   const path = isAllowance ? "/allowance" : "";
 
-  const requesterFid = validationResult?.isValid
+  const requesterFid = message
     ? isCastAction && !isSelf
       ? message?.castId?.fid
       : message?.requesterFid

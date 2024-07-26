@@ -1,4 +1,5 @@
 import { pgDb } from "../../db/pg-db";
+import { fetchAllowanceFromDownshift } from "../fetch-allowance-from-downshift";
 import {
   RaindropBalance,
   fetchRaindropBalance,
@@ -176,6 +177,12 @@ async function getAllowanceDataFromOfficialApi(fid: number) {
   return { ...res, remainingAllowance };
 }
 
+const defaultAllowanceData: DegenAllowanceStats = {
+  tipAllowance: 0,
+  remainingAllowance: 0,
+  minRank: -1,
+};
+
 async function getAllowanceDataFromEdit(fid: number) {
   const tipAllowanceRes = await fetchAllowanceFromEdit(fid);
   return tipAllowanceRes
@@ -190,10 +197,42 @@ async function getAllowanceDataFromEdit(fid: number) {
           ? parseInt(tipAllowanceRes.user_rank, 10)
           : -1,
       }
-    : { tipAllowance: 0, remainingAllowance: 0, minRank: -1 };
+    : defaultAllowanceData;
 }
 
-const getAllowanceData = getAllowanceDataFromEdit;
+async function getAllowanceDataFromDownshift(fid: number) {
+  const tipAllowanceRes = await fetchAllowanceFromDownshift(fid);
+  return tipAllowanceRes
+    ? {
+        tipAllowance: tipAllowanceRes.allowance,
+        remainingAllowance: tipAllowanceRes.remainingAllowance,
+        minRank: -1,
+      }
+    : defaultAllowanceData;
+}
+
+async function safeGetAllowanceData(
+  fid: number,
+  fn: (fid: number) => Promise<DegenAllowanceStats>
+): Promise<DegenAllowanceStats> {
+  try {
+    return await fn(fid);
+  } catch (e) {
+    console.error(e);
+    return defaultAllowanceData;
+  }
+}
+
+const getAllowanceData = async (fid: number): Promise<DegenAllowanceStats> => {
+  const [editRes, dsRes] = await Promise.all([
+    safeGetAllowanceData(fid, getAllowanceDataFromEdit),
+    safeGetAllowanceData(fid, getAllowanceDataFromDownshift),
+  ]);
+  return {
+    ...(dsRes !== defaultAllowanceData ? dsRes : editRes),
+    minRank: editRes.minRank,
+  };
+};
 
 export async function fetchDegenAllowanceStats(
   fid: number,

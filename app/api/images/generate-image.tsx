@@ -5,9 +5,10 @@ import { baseUrl as fallbackBaseUrl } from "../../constants";
 import { DegenAllowanceStats, DegenStats } from "./fetch-degen-stats";
 import { addDays, getDailyAllowanceStart } from "./utils";
 
+// TODO -- figure out proper caching
 async function toImage(
   image: React.ReactElement,
-  ratio?: "1:1" | "1.91:1"
+  { ratio, cached }: { ratio?: "1:1" | "1.91:1"; cached?: boolean } = {}
 ): Promise<ImageResponse> {
   return new ImageResponse(image, {
     ...options,
@@ -536,10 +537,14 @@ function InitialImage({
 
 interface ImageOptions {
   baseUrl?: string;
+  cached?: boolean;
 }
 
-async function toAllowanceImage(image: React.ReactElement) {
-  return toImage(image, "1.91:1");
+async function toAllowanceImage(
+  image: React.ReactElement,
+  options: ImageOptions
+) {
+  return toImage(image, { ratio: "1.91:1" });
 }
 
 export async function generateInitialImage(
@@ -548,7 +553,8 @@ export async function generateInitialImage(
   return toImage(
     <ImageLayout baseUrl={options.baseUrl}>
       <InitialImage baseUrl={options.baseUrl} />
-    </ImageLayout>
+    </ImageLayout>,
+    { cached: options.cached }
   );
 }
 
@@ -558,7 +564,8 @@ export async function generateAllowanceInitialImage(
   return toAllowanceImage(
     <ImageLayout baseUrl={options.baseUrl} compact>
       <AllowanceInitialImage baseUrl={options.baseUrl} />
-    </ImageLayout>
+    </ImageLayout>,
+    options
   );
 }
 
@@ -573,7 +580,8 @@ export async function generateErrorImage(
   return toImage(
     <ImageLayout baseUrl={options.baseUrl}>
       <InitialImage message={error} baseUrl={options.baseUrl} />
-    </ImageLayout>
+    </ImageLayout>,
+    { cached: options.cached }
   );
 }
 
@@ -588,7 +596,8 @@ export async function generateAllowanceErrorImage(
   return toAllowanceImage(
     <ImageLayout baseUrl={options.baseUrl} compact>
       <AllowanceInitialImage message={error} baseUrl={options.baseUrl} />
-    </ImageLayout>
+    </ImageLayout>,
+    options
   );
 }
 
@@ -599,7 +608,8 @@ export async function generateStatsImage(
   return toImage(
     <ImageLayout baseUrl={options.baseUrl}>
       <StatsImage {...props} />
-    </ImageLayout>
+    </ImageLayout>,
+    { cached: options.cached }
   );
 }
 
@@ -610,6 +620,7 @@ export async function generateAllowanceStatsImage(
   return toAllowanceImage(
     <ImageLayout baseUrl={options.baseUrl} compact>
       <AllowanceStatsImage {...props} />
-    </ImageLayout>
+    </ImageLayout>,
+    options
   );
 }

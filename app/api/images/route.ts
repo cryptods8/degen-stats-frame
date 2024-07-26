@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
 
     return generateStatsImage(
       { stats, addresses, userData: userData ?? {} },
-      imageOptions
+      { ...imageOptions, cached: true }
     );
   } catch (e) {
     console.error(e);

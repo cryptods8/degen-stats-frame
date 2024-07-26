@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
     return generateAllowanceStatsImage(
       { stats, addresses, userData: userData ?? {} },
-      imageOptions
+      { ...imageOptions, cached: true }
     );
   } catch (e) {
     console.error(e);
