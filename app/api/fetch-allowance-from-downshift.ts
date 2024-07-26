@@ -12,7 +12,8 @@ https://degentip.bot/allowance/degen/243719
 export interface AllowanceFromDownshift {
   fid: number;
   timeUntilReset: string;
-  snapshotDate: string;
+  snapshotDate: string | boolean;
+  userRank: number | null;
   allowance: number;
   remainingAllowance: number;
 }

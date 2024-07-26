@@ -206,7 +206,7 @@ async function getAllowanceDataFromDownshift(fid: number) {
     ? {
         tipAllowance: tipAllowanceRes.allowance,
         remainingAllowance: tipAllowanceRes.remainingAllowance,
-        minRank: -1,
+        minRank: tipAllowanceRes.userRank ?? -1,
       }
     : defaultAllowanceData;
 }
@@ -223,16 +223,7 @@ async function safeGetAllowanceData(
   }
 }
 
-const getAllowanceData = async (fid: number): Promise<DegenAllowanceStats> => {
-  const [editRes, dsRes] = await Promise.all([
-    safeGetAllowanceData(fid, getAllowanceDataFromEdit),
-    safeGetAllowanceData(fid, getAllowanceDataFromDownshift),
-  ]);
-  return {
-    ...(dsRes !== defaultAllowanceData ? dsRes : editRes),
-    minRank: editRes.minRank,
-  };
-};
+const getAllowanceData = getAllowanceDataFromDownshift;
 
 export async function fetchDegenAllowanceStats(
   fid: number,
