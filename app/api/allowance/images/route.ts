@@ -1,8 +1,7 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import {
   generateAllowanceInitialImage,
-  generateAllowanceErrorImage,
   generateAllowanceStatsImage,
 } from "../../images/generate-image";
 import { getAddressesForFid, getUserDataForFid } from "frames.js";
@@ -40,11 +39,9 @@ export async function GET(req: NextRequest) {
     );
   } catch (e) {
     console.error(e);
-    return generateAllowanceErrorImage(
-      {
-        error: "Error occured: " + (e as any).message,
-      },
-      imageOptions
+    return NextResponse.json(
+      { error: "Internal error occured" },
+      { status: 500 }
     );
   } finally {
     console.log(`Time for GET /api/images: ${Date.now() - start}ms`);

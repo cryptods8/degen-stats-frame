@@ -113,7 +113,7 @@ function HatPanel({
   return (
     <div
       tw={`flex items-center ${
-        vertical ? "flex-col h-full pl-20 py-12" : "w-full pt-16 pb-12"
+        vertical ? "flex-col h-full pl-20 py-12" : "w-full pt-28 pb-12"
       }`}
       style={{ gap: "3rem" }}
     >
@@ -395,12 +395,12 @@ function StatsImage(props: StatsImageProps<DegenStats>) {
               value={formatNumber(stats.points + stats.pointsLiquidityMining)}
             />
             <StatsSubItem label="- tips" value={formatNumber(stats.points)} />
-            {/* <StatsSubItem
+            <StatsSubItem
               label="- liquidity mining"
               value={formatNumber(stats.pointsLiquidityMining)}
-            /> */}
+            />
           </StatsItemContainer>
-          <StatsItemContainer>
+          {/* <StatsItemContainer>
             <StatsItem
               label="Raindrop balance"
               value={
@@ -419,7 +419,7 @@ function StatsImage(props: StatsImageProps<DegenStats>) {
                 maxValue={stats.raindropBalance.total || 0}
               />
             )}
-          </StatsItemContainer>
+          </StatsItemContainer> */}
         </div>
       </div>
     </div>

@@ -41,7 +41,8 @@ const tipAllowanceApi: TipAllowanceDegenApi = {
   fetchByFid: true,
 };
 const liquidityMiningApi: PointsDegenApi = {
-  path: "/api/liquidity-mining/season4/points",
+  path: "https://api.degen.tips/liquidity-mining/current/points",
+  full: true,
 };
 
 function getApiBasePath(api: DegenApi<any>) {
@@ -53,6 +54,7 @@ async function fetchDegenData<T extends BaseDegenResponseItem>(
   fid: number,
   walletAddresses: string[]
 ): Promise<DegenResponse<T>[]> {
+  console.log("fetchDegenData", getApiBasePath(api));
   const allFetches = api.fetchByFid
     ? [fetch(`${getApiBasePath(api)}?fid=${fid}`).then((res) => res.json())]
     : walletAddresses.map((walletAddress) =>
@@ -74,7 +76,7 @@ export interface DegenAllowanceStats {
 export interface DegenStats extends DegenAllowanceStats {
   points: number;
   pointsLiquidityMining: number;
-  raindropBalance: RaindropBalance;
+  raindropBalance?: RaindropBalance;
 }
 
 function combinePoints(
@@ -239,12 +241,11 @@ export async function fetchDegenStats(
   const allApiFetches = [pointsApi, liquidityMiningApi].map(async (api) =>
     fetchDegenData(api, fid, walletAddresses)
   );
-  const [pointsRes, liquidityMiningRes, allowanceRes, raindropBalance] =
-    await Promise.all([
-      ...allApiFetches,
-      getAllowanceData(fid),
-      fetchRaindropBalance({ fid, addresses: walletAddresses }),
-    ]);
+  const [pointsRes, liquidityMiningRes, allowanceRes] = await Promise.all([
+    ...allApiFetches,
+    getAllowanceData(fid),
+    // fetchRaindropBalance({ fid, addresses: walletAddresses }),
+  ]);
   const points = combinePoints(
     pointsRes as DegenResponse<PointsDegenResponseItem>[] | undefined
   );
@@ -255,6 +256,5 @@ export async function fetchDegenStats(
     ...(allowanceRes as DegenAllowanceStats),
     points,
     pointsLiquidityMining,
-    raindropBalance: raindropBalance as RaindropBalance,
   };
 }
