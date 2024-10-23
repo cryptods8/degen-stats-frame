@@ -1450,10 +1450,10 @@
   dependencies:
     crypto-js "^4.2.0"
 
-"@vercel/og@^0.6.2":
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/@vercel/og/-/og-0.6.2.tgz#228b064451c6ea4e3900e2c94404bec57f7fd172"
-  integrity sha512-OTe0KE37F5Y2eTys6eMnfopC+P4qr2ooXUTFyFPTplYSPwowmFk/HLD1FXtbKLjqsIH0SgekcJWad+C5uX4nkg==
+"@vercel/og@^0.6.3":
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/@vercel/og/-/og-0.6.3.tgz#7d59572acb12df28637c226343fce7078c306b64"
+  integrity sha512-aoCrC9FqkeA+WEEb9CwSmjD0rGlFeNqbUsI41JPmKWR9Hx6FFn86tvH96O5HZMF6VAXTGHxa3nPH3BokROpdgA==
   dependencies:
     "@resvg/resvg-wasm" "2.4.0"
     satori "0.10.9"
@@ -3203,12 +3203,12 @@ fraction.js@^4.3.7:
   resolved "https://registry.yarnpkg.com/fraction.js/-/fraction.js-4.3.7.tgz#06ca0085157e42fda7f9e726e79fefc4068840f7"
   integrity sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==
 
-frames.js@^0.15.1:
-  version "0.15.1"
-  resolved "https://registry.yarnpkg.com/frames.js/-/frames.js-0.15.1.tgz#d6e33788e34490efc95e5faaee3c3d1f69a2677b"
-  integrity sha512-5DyeJbDjCqUEhCSv7E/eXni1oED2VAW7mKJZcrq416M1RNOSL4dWMzF9uG/sYf3OVhwNBhCmlSrJwA1rHOHFKQ==
+frames.js@^0.19.4:
+  version "0.19.4"
+  resolved "https://registry.yarnpkg.com/frames.js/-/frames.js-0.19.4.tgz#47299ffbfdc3a774e4d9fe3c483b8cb30351e55e"
+  integrity sha512-QzKk6BRtrX8uPWeuHcdQ+xehfmok42a95M9VMm7I2Kt+gwmCC3avqAcJUsS9pmmf9Ftwc4EVLswkExRbDWKm2w==
   dependencies:
-    "@vercel/og" "^0.6.2"
+    "@vercel/og" "^0.6.3"
     cheerio "^1.0.0-rc.12"
     protobufjs "^7.2.6"
     viem "^2.7.8"

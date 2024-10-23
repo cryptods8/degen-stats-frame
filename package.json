@@ -12,10 +12,10 @@
   "dependencies": {
     "@airstack/node": "^0.0.6",
     "@upstash/redis": "^1.30.0",
-    "@vercel/og": "^0.6.2",
+    "@vercel/og": "^0.6.3",
     "@vercel/postgres": "^0.8.0",
     "@vercel/postgres-kysely": "^0.8.0",
-    "frames.js": "^0.15.1",
+    "frames.js": "^0.19.4",
     "kysely": "^0.27.3",
     "next": "14.1.4",
     "react": "^18.2.0",
