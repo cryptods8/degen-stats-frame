@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       return acc;
     }, [] as string[]);
     const [userData, stats] = await Promise.all([
-      getUserDataForFid({ fid }),
+      getUserDataForFid({ fid }).catch(() => null),
       fetchDegenAllowanceStats(fid, addresses),
     ]);
 
