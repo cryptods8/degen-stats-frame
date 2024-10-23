@@ -1,5 +1,3 @@
-import { ActionMetadata } from "frames.js";
-
 import { basePath, frames } from "../../../frames/frames";
 import { baseUrl } from "../../../constants";
 import { NextRequest } from "next/server";
@@ -10,7 +8,7 @@ interface Params {
 
 export const GET = async (req: NextRequest, { params }: { params: Params }) => {
   const actionName = params.actionType === "allowance" ? "allowance" : "stats";
-  const actionMetadata: ActionMetadata = {
+  const actionMetadata = {
     action: {
       type: "post",
     },
