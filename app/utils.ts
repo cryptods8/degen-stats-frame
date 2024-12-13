@@ -17,7 +17,7 @@ export function createShareUrl(basePath: string, fid: number): string {
   const signedUrl = signUrl(fullUrl);
 
   const shareRedirectParams = new URLSearchParams();
-  shareRedirectParams.append("text", "$DEGEN stats by @ds8");
+//  shareRedirectParams.append("text", "$DEGEN stats by @ds8");
   shareRedirectParams.set("embeds[]", signedUrl);
   return `https://warpcast.com/~/compose?${shareRedirectParams.toString()}`;
 }
