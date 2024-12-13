@@ -23,7 +23,7 @@
     "signed": "^2.0.3"
   },
   "engines": {
-    "node": ">=18.17.0"
+    "node": ">=18.17.0 <22.0.0"
   },
   "devDependencies": {
     "@frames.js/debugger": "^0.3.15",
