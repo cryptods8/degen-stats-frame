@@ -168,15 +168,16 @@ const getAllTips =
 // const getAllowanceData;
 
 async function getAllowanceDataFromOfficialApi(fid: number) {
-  const [tipAllowanceRes, dailyTips] = await Promise.all([
-    fetchDegenData(tipAllowanceApi, fid, []),
-    getAllTips(fid),
-  ]);
-  const res = combineTipAllowance(
-    (tipAllowanceRes as DegenResponse<TipAllowanceDegenResponseItem>[]) || []
+  const res = await fetch(
+    `https://api.degen.tips/airdrop2/allowances?fid=${fid}&limit=1`
   );
-  const remainingAllowance = getRemainingAllowance(res, dailyTips);
-  return { ...res, remainingAllowance };
+  const data = await res.json();
+  const allowance = data[0];
+  return {
+    tipAllowance: parseInt(allowance.tip_allowance, 10),
+    remainingAllowance: parseInt(allowance.remaining_tip_allowance, 10),
+    minRank: parseInt(allowance.user_rank, 10),
+  };
 }
 
 const defaultAllowanceData: DegenAllowanceStats = {
@@ -225,7 +226,7 @@ async function safeGetAllowanceData(
   }
 }
 
-const getAllowanceData = getAllowanceDataFromDownshift;
+const getAllowanceData = getAllowanceDataFromOfficialApi;
 
 export async function fetchDegenAllowanceStats(
   fid: number,
